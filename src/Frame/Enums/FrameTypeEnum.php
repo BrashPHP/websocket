@@ -1,8 +1,15 @@
 <?php
 
-namespace Kit\Websocket\Frame;
+declare(strict_types=1);
+
+namespace Kit\Websocket\Frame\Enums;
 
 
+/**
+ * Defines the opcode used in the frame.
+ * The opcode is the second part of the very first byte.
+ * Thus it is possible to extract it via a simple `$fullbyte & 15` bitwise operation.
+ */
 enum FrameTypeEnum: int
 {
     case Continuation = 0x00;

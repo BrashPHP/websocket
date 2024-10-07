@@ -1,5 +1,5 @@
 <?php
-namespace Kit\Websocket\Frame;
+namespace Kit\Websocket\Frame\Enums;
 
 enum CloseFrameEnum: int
 {

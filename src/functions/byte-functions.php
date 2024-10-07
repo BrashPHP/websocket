@@ -2,8 +2,8 @@
 
 namespace Kit\Websocket\functions;
 
-use Kit\Websocket\DataManipulation\Exceptions\InvalidBitException;
-use Kit\Websocket\DataManipulation\Exceptions\InvalidByteException;
+use Kit\Websocket\Frame\DataManipulation\Exceptions\InvalidBitException;
+use Kit\Websocket\Frame\DataManipulation\Exceptions\InvalidByteException;
 
 if (!function_exists('validateByte')) {
     function validateByte(int $byte)

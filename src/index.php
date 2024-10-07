@@ -15,11 +15,11 @@ $socket = new React\Socket\SocketServer($argv[1] ?? '127.0.0.1:0', loop: $loop);
 
 $socket = new React\Socket\LimitingServer($socket, null);
 
-$socket->on('connection', function (React\Socket\ConnectionInterface $connection) use ($socket) {
+$socket->on('connection', function (React\Socket\ConnectionInterface $connection) use ($socket): void {
     echo '[' . $connection->getRemoteAddress() . ' connected]' . PHP_EOL;
 
     // whenever a new message comes in
-    $connection->on('data', function ($data) use ($connection, $socket) {
+    $connection->on('data', function ($data) use ($connection, $socket): void {
         // ignore empty messages
         if ($data === '') {
             return;
@@ -32,12 +32,12 @@ $socket->on('connection', function (React\Socket\ConnectionInterface $connection
         }
     });
 
-    $connection->on('close', function () use ($connection) {
+    $connection->on('close', function () use ($connection): void {
         echo '[' . $connection->getRemoteAddress() . ' disconnected]' . PHP_EOL;
     });
 });
 
-$socket->on('error', function (Exception $e) {
+$socket->on('error', function (Exception $e): void {
     echo 'Error: ' . $e->getMessage() . PHP_EOL;
 });
 

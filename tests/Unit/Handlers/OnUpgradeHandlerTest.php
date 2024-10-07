@@ -10,7 +10,7 @@ use React\Socket\ConnectionInterface;
 
 
 
-test('should receive event correctly', function () {
+test('should receive event correctly', function (): void {
     $listenerProvider = new ListenerProvider();
     /** @var ConnectionInterface|\Mockery\MockInterface */
     $connectionInterfaceMock = mock(ConnectionInterface::class);

@@ -6,6 +6,13 @@ namespace Kit\Websocket\functions;
 
 
 if (!function_exists('getBytes')) {
+    /**
+     * This function receives a string and returns every byte from it
+     *
+     * @param string $string
+     * @param string $charset
+     * @return int[]
+     */
     function getBytes(string $string, string $charset = 'UTF-8'): array
     {
         return \array_values(
