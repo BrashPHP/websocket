@@ -12,4 +12,26 @@ if (!function_exists('println')) {
     }
 }
 
+if (!function_exists('removeStart')) {
+    function removeStart(string $str, string $toRemove): string
+    {
+        if (startsWith($str, $toRemove)) {
+            return $str;
+        }
+        $sizeToRemove = strlen($toRemove);
+
+        return substr($str, $sizeToRemove, strlen($str) - $sizeToRemove);
+    }
+}
+
+if (!function_exists('startsWith')) {
+    function startsWith($str, $start)
+    {
+        $length = strlen($start);
+
+        return substr($str, 0, $length) === $start;
+    }
+
+}
+
 

@@ -18,7 +18,7 @@ final class ControlFrameValidation implements FrameOpcodeValidatorInterface
                 throw new ControlFrameException('The frame cannot be fragmented');
             }
 
-            if ($frame->getFramePayload()->payloadLen > self::MAX_CONTROL_FRAME_SIZE) {
+            if ($frame->getFramePayload()->getPayloadLength() > self::MAX_CONTROL_FRAME_SIZE) {
                 throw new TooBigControlFrameException('A control frame cannot be larger than 125 bytes.');
             }
         }

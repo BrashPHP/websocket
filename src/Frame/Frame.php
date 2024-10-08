@@ -36,7 +36,7 @@ class Frame
     ) {
     }
 
-    public function getOpcode()
+    public function getOpcode(): FrameTypeEnum
     {
         return $this->opcode;
     }
@@ -61,7 +61,7 @@ class Frame
         $data .= $this->buildInitialDataPortion($firstLen);
 
         // Append second length if necessary
-        if ($secondLen !== null) {
+        if (!is_null($secondLen)) {
             $data .= intToBinaryString($secondLen, $firstLen === 126 ? 2 : 8);
         }
 
@@ -85,9 +85,9 @@ class Frame
         return $this->opcode->isControlFrame();
     }
 
-    private function buildInitialDataPortion(int $firstLen)
+    private function buildInitialDataPortion(int $firstLen): string
     {
-        $newHalfFirstByte = ($this->final ?? 1) << 7;
+        $newHalfFirstByte = (intval($this->isFinal())) << 7;
         $newFirstByte = ($newHalfFirstByte + $this->opcode->value) << 8;
         $newSecondByte = ($this->framePayload->isMasked() << 7) + $firstLen;
 

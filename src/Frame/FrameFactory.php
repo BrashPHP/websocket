@@ -23,7 +23,7 @@ class FrameFactory
     {
     }
 
-    public function newFrame(string $payload, FrameTypeEnum $frameTypeEnum, bool $writeMask)
+    public function newFrame(string $payload, FrameTypeEnum $frameTypeEnum, bool $writeMask): Frame
     {
         return FrameBuilder::createFromPayload(
             $payload,
@@ -33,18 +33,22 @@ class FrameFactory
     }
 
     /**
-     * @param int    $status One of the close constant code of Frame class.
+     * @param CloseFrameEnum    $status One of the close constant code closing enum.
      * @param string $reason A little message that explain why closing.
      * @return Frame
      */
-    public function createCloseFrame(int $status = CloseFrameEnum::CLOSE_NORMAL, string $reason = null): Frame
+    public function createCloseFrame(CloseFrameEnum $status = CloseFrameEnum::CLOSE_NORMAL, string $reason = null): Frame
     {
-        $content = intToBinaryString($status);
-        if (null !== $reason) {
+        $content = intToBinaryString($status->value);
+        if (!is_null($reason)) {
             $content .= $reason;
         }
 
-        return FrameBuilder::createFromPayload($content, FrameTypeEnum::Close, false);
+        return FrameBuilder::createFromPayload(
+            $content,
+            FrameTypeEnum::Close,
+            createMask: false
+        );
     }
 
     /**
@@ -53,6 +57,6 @@ class FrameFactory
      */
     public function createPongFrame(string $payload): Frame
     {
-        return FrameBuilder::createFromPayload($payload, FrameTypeEnum::Pong, false);
+        return FrameBuilder::createFromPayload($payload, FrameTypeEnum::Pong, createMask: false);
     }
 }

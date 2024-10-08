@@ -8,7 +8,7 @@ use function Kit\Websocket\functions\frameSize;
 
 final class GetNthByteFunction
 {
-        /**
+    /**
      * Get a specific byte from a frame represented as either an integer or a string.
      * The byte offset starts at 0.
      *

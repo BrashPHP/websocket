@@ -12,9 +12,9 @@ use Kit\Websocket\Frame\DataManipulation\Exceptions\{
 };
 use Kit\Websocket\Frame\Exceptions\InvalidNegativeNumberFrameException;
 
-final class ByteSequenceFunction 
+final class ByteSequenceFunction
 {
-        /**
+    /**
      * Extracts and returns a byte sequence from a frame between the specified range.
      *
      * @param string|int $frame       The frame data, either as a string or an integer.

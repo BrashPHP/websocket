@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Frame;
 
 use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;

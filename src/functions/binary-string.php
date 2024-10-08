@@ -93,7 +93,7 @@ if (!function_exists('hexArrayToString')) {
             string $hexNum
         ) =>
             $carry . \chr(\hexdec($hexNum)),
-            ""
+            initial: ""
         );
     }
 }

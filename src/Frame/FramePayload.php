@@ -66,12 +66,17 @@ class FramePayload
         return $this->maskingKey;
     }
 
+    public function getLenSize(): int {
+        return $this->lenSize;
+    }
+
     /**
      * Calculate the first length based on payload length.
      */
     public function getFirstLength(): int
     {
         $payloadLen = $this->payloadLen;
+        
         if ($payloadLen < 126) {
             return $payloadLen;
         }
@@ -96,6 +101,6 @@ class FramePayload
 
     public function isMasked(): bool
     {
-        return $this->maskingKey === '';
+        return $this->maskingKey !== '';
     }
 }

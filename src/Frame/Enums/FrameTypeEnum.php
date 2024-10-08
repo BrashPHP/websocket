@@ -23,4 +23,13 @@ enum FrameTypeEnum: int
     {
         return $this->value >= 0x08;
     }
+
+    /**
+     * TODO: Add test
+     * @return bool
+     */
+    public function isOperation(): bool
+    {
+        return $this === FrameTypeEnum::Text || $this === FrameTypeEnum::Binary;
+    }
 }

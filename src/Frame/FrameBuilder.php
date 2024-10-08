@@ -14,6 +14,7 @@ use Kit\Websocket\Frame\FrameValidation\ValidationUponOpCode;
 use function Kit\Websocket\functions\frameSize;
 use function Kit\Websocket\functions\intToBinaryString;
 use function Kit\Websocket\functions\nthBitFromByte;
+use function Kit\Websocket\functions\println;
 
 final class FrameBuilder
 {
@@ -26,15 +27,12 @@ final class FrameBuilder
 
         $maybeTruncated = $this->checkSize(
             $data,
-            $framePayload->getPayloadLength(),
-            $framePayload->isMasked()
+            $framePayload
         );
 
         if ($data !== $maybeTruncated) {
             return $this->build($maybeTruncated);
         }
-
-        $this->checkSize($data, $framePayload->getPayloadLength(), $framePayload->isMasked());
 
         $frame = new Frame(
             $opcode,
@@ -62,7 +60,7 @@ final class FrameBuilder
         $mask = $createMask ? random_bytes(4) : "";
         $framePayload = new FramePayload($payload, $payloadLen, $payloadLenSize, $mask);
 
-        $metadata = new FrameMetadata(firstByte: 0);
+        $metadata = new FrameMetadata(firstByte: 128);
 
         return new Frame($frameTypeEnum, $metadata, $framePayload);
     }
@@ -173,9 +171,12 @@ final class FrameBuilder
      *
      * @return string
      */
-    public function checkSize(string $data, int $payloadLen, bool $isMasked): string
+    public function checkSize(string $data, FramePayload $framePayload): string
     {
-        $infoBytesLen = $this->getInfoBytesLen($payloadLen, $isMasked);
+        $payloadLen = $framePayload->getPayloadLength();
+        $lenSize = $framePayload->getLenSize();
+        $isMasked = $framePayload->isMasked();
+        $infoBytesLen = $this->getInfoBytesLen(lenSize: $lenSize, isMasked: $isMasked);
         $frameSize = frameSize($data);
         $theoricDataLength = $infoBytesLen + $payloadLen;
 
