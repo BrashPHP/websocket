@@ -21,18 +21,11 @@ use function Kit\Websocket\functions\intToBinaryString;
 
 class Frame
 {
-
-    /**
-     * @param \Kit\Websocket\Frame\Enums\FrameTypeEnum $opcode
-     * @param \Kit\Websocket\Frame\FrameMetadata $metadata
-     * @param \Kit\Websocket\Frame\FramePayload $framePayload
-     * @param int $maxPayloadSize (0.5MiB) Adjust if needed.
-     */
     public function __construct(
         private FrameTypeEnum $opcode,
         private FrameMetadata $metadata,
         private FramePayload $framePayload,
-        private int $maxPayloadSize = 524288
+        private int $maxPayloadSize
     ) {
     }
 

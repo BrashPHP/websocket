@@ -21,7 +21,7 @@ test('Should create close frame', function () {
 test('Should create pong frame', function () {
     $pingMessage = new Message();
     $hexStr = hexArrayToString(['89', '00']);
-    $frameBuilt = (new FrameBuilder())->build($hexStr);
+    $frameBuilt = (new FrameBuilder(maxPayloadSize: 50000))->build($hexStr);
     $pingMessage->addFrame($frameBuilt);
     $factory = new FrameFactory();
     $message = $pingMessage->getContent();

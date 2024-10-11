@@ -17,7 +17,7 @@ final readonly class FrameMetadata
     public bool $rsv1;
     public bool $rsv2;
     public bool $rsv3;
-    
+
 
     public function __construct(private int $firstByte)
     {
@@ -27,5 +27,27 @@ final readonly class FrameMetadata
         $this->rsv1 = boolval(nthBitFromByte($this->firstByte, 2));
         $this->rsv2 = boolval(nthBitFromByte($this->firstByte, 3));
         $this->rsv3 = boolval(nthBitFromByte($this->firstByte, 4));
+    }
+
+    /**
+     * Checks whether the library offers support to the current extension
+     *
+     * @return void
+     */
+    public function isUnsupportedExtension(): bool
+    {
+        $unsupportedExtensions = [
+            $this->rsv1,
+            $this->rsv2,
+            $this->rsv3
+        ];
+
+        foreach ($unsupportedExtensions as $unsupportedExtension) {
+            if ($unsupportedExtension) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

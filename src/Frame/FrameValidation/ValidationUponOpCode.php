@@ -1,11 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Kit\Websocket\Frame\FrameValidation;
+
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
+use Kit\Websocket\Frame\Exceptions\ProtocolErrorException;
 use Kit\Websocket\Frame\Frame;
+use Kit\Websocket\Frame\Protocols\FrameOpcodeValidatorInterface;
 
 final class ValidationUponOpCode implements FrameOpcodeValidatorInterface
 {
-    public function validate(Frame $frame): void
+    public function validate(Frame $frame): ?ProtocolErrorException
     {
         $validator = null;
 
@@ -15,6 +21,6 @@ final class ValidationUponOpCode implements FrameOpcodeValidatorInterface
             $validator = new CloseFrameValidation();
         }
 
-        $validator?->validate($frame);
+        return $validator?->validate($frame);
     }
 }

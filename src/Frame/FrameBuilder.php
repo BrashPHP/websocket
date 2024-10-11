@@ -4,49 +4,79 @@ declare(strict_types=1);
 
 namespace Kit\Websocket\Frame;
 
-use Kit\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
 use Kit\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
+use Kit\Websocket\Frame\DataManipulation\Functions\GetInfoBytesLengthFunction;
 use Kit\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
 use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;
-use Kit\Websocket\Frame\FrameValidation\ValidationUponOpCode;
 use function Kit\Websocket\functions\frameSize;
-use function Kit\Websocket\functions\intToBinaryString;
-use function Kit\Websocket\functions\nthBitFromByte;
-use function Kit\Websocket\functions\println;
+
 
 final class FrameBuilder
 {
-    public function build(string $data, int $maxPayloadSize = 524288): Frame
+    private PayloadExtractor $payloadExtractor;
+    private PayloadLengthCalculator $payloadLengthCalculator;
+
+    public function __construct(private int $maxPayloadSize)
     {
+        $this->payloadExtractor = new PayloadExtractor();
+        $this->payloadLengthCalculator = new PayloadLengthCalculator();
+    }
+
+    /**
+     * Creates a new frame based on incoming streaming data
+     * @param string $data
+     *
+     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\NotLongEnoughException if the string frame is shorter than expected.
+     * @throws \Kit\Websocket\Frame\Exceptions\InvalidNegativeNumberFrameException if the integer frame is negative.
+     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\InvalidRangeException
+     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\BadByteSizeRequestedException
+     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\PhpByteLimitationException
+     */
+    public function build(string $data): Frame|IncompleteFrameException
+    {
+        $maxPayloadSize = $this->maxPayloadSize;
         $firstByte = GetNthByteFunction::nthByte(frame: $data, byteNumber: 0);
         $frameMetadata = $this->processMetadata($firstByte);
         $opcode = $this->processOpcode($firstByte);
-        $framePayload = $this->processPayload($data);
 
-        $maybeTruncated = $this->checkSize(
-            $data,
-            $framePayload
-        );
+        $payloadLengthResult = $this->getPayloadLength($data);
+        if (!is_null($payloadLengthResult)) {
+            $framePayload = $this->payloadExtractor->processPayload($data, $payloadLengthResult);
 
-        if ($data !== $maybeTruncated) {
-            return $this->build($maybeTruncated);
+            $theoricDataLength = $this->getTheoricDataLength(framePayload: $framePayload);
+            $frameSize = frameSize($data);
+            
+            if ($frameSize < $theoricDataLength) {
+                return new IncompleteFrameException(
+                    message:
+                    sprintf(
+                        'Impossible to retrieve %s bytes of payload when the full frame is %s bytes long.',
+                        $theoricDataLength,
+                        $frameSize
+                    )
+                );
+            }
+
+            return ($frameSize > $theoricDataLength) ?
+                $this->build(
+                    $this->truncateRawData(
+                        $data,
+                        $theoricDataLength
+                    )
+                ) : new Frame(
+                    $opcode,
+                    $frameMetadata,
+                    $framePayload,
+                    $maxPayloadSize
+                );
         }
 
-        $frame = new Frame(
-            $opcode,
-            $frameMetadata,
-            $framePayload,
-            $maxPayloadSize
-        );
-
-        $this->validateFrame($frame);
-
-        return $frame;
+        return new IncompleteFrameException('Impossible to determine the length of the frame because message is too small.');
     }
 
-    public static function createFromPayload(string $payload, FrameTypeEnum $frameTypeEnum, bool $createMask): Frame
+    public function createFromPayload(string $payload, FrameTypeEnum $frameTypeEnum, bool $createMask): Frame
     {
         $payloadLen = frameSize($payload);
         $payloadLenSize = 7;
@@ -62,12 +92,17 @@ final class FrameBuilder
 
         $metadata = new FrameMetadata(firstByte: 128);
 
-        return new Frame($frameTypeEnum, $metadata, $framePayload);
+        return new Frame($frameTypeEnum, $metadata, $framePayload, $this->maxPayloadSize);
     }
 
-    public function validateFrame(Frame $frame)
+    private function truncateRawData(string $rawData, int $theoricDataLength): string
     {
-        (new ValidationUponOpCode())->validate($frame);
+        return BytesFromToStringFunction::getBytesFromToString(
+            frame: $rawData,
+            from: 0,
+            to: $theoricDataLength,
+            inspectionFrameEnum: InspectionFrameEnum::MODE_PHP
+        );
     }
 
     /**
@@ -83,124 +118,40 @@ final class FrameBuilder
      */
     private function processOpcode(int $firstByte): FrameTypeEnum
     {
-        return FrameTypeEnum::from(value: $firstByte & 15);
+        $opcode = FrameTypeEnum::tryFrom(value: $firstByte & 15);
+        if (!is_null($opcode)) {
+            return $opcode;
+        }
+
+        throw new \InvalidArgumentException('Invalid Opcode');
     }
 
-    /**
-     * Generates a payload from the frame.
-     */
-    private function processPayload(string $rawData): FramePayload
-    {
-        [$lenSize, $payloadLen] = $this->getPayloadLength($rawData);
-        $isMasked = $this->getIsMasked($rawData);
-        $payload = $this->extractPayload($rawData, $isMasked);
-        $maskingKey = $isMasked ? $this->extractMaskingKey($rawData, $lenSize) : "";
-
-        return new FramePayload(
-            $payload,
-            $payloadLen,
-            $lenSize,
-            $maskingKey
-        );
-    }
-
-    private function extractMaskingKey(string $rawData, int $lenSize)
-    {
-        // 8 is the numbers of bits before the payload len.
-        $start = (9 + $lenSize) / 8;
-
-        $value = ByteSequenceFunction::bytesFromTo(frame: $rawData, from: $start, to: $start + 3);
-
-        return intToBinaryString($value, 4);
-    }
-
-    private function getPayloadLength(string $rawData): array
-    {
-        $payloadLengthCalculator = new PayloadLengthCalculator();
-
-        return $payloadLengthCalculator->getLength($rawData);
-    }
-
-    /**
-     * The very first bit of the second byte explicits whether a mask is being used.
-     */
-    private function getIsMasked(string $rawData): bool
+    public function getPayloadLength(string $rawData): ?PayloadLengthDto
     {
         $secondByte = GetNthByteFunction::nthByte(frame: $rawData, byteNumber: 1);
+        $result = $this->payloadLengthCalculator->getPayloadLength($secondByte);
 
-        return nthBitFromByte($secondByte, 1) === 1;
-    }
+        if (\strlen($rawData) < $result->threshold + 1) {
+            return null;
+        }
 
-    private function extractPayload(string $rawData, bool $isMasked): string
-    {
-        [$lenSize, $payloadLen] = $this->getPayloadLength($rawData);
-        $infoBytesLen = $this->getInfoBytesLen($lenSize, $isMasked);
-
-        return (string) BytesFromToStringFunction::getBytesFromToString(
-            $rawData,
-            $infoBytesLen,
-            $payloadLen,
-            inspectionFrameEnum: InspectionFrameEnum::MODE_PHP
-        );
-    }
-
-    /**
-     * Get length of meta data of the frame.
-     * Metadata contains type of frame, length, masking key and rsv data.
-     */
-    public function getInfoBytesLen(int $lenSize, bool $isMasked): int
-    {
-        return intval((9 + $lenSize) / 8 + ($isMasked ? 4 : 0));
-    }
-
-    /**
-     * This generates a string of 4 random bytes. (WebSocket mask according to the RFC)
-     *
-     * @return string
-     */
-    public function generateMask(): string
-    {
-        return random_bytes(4);
+        return $result;
     }
 
     /**
      * Checks payload size and truncate data if needed.
-     * @param string $data
-     * @throws \Kit\Websocket\Frame\Exceptions\IncompleteFrameException
-     * @throws \Kit\Websocket\Frame\Exceptions\ProtocolErrorException
      *
-     * @return string
+     * @param string $data
      */
-    public function checkSize(string $data, FramePayload $framePayload): string
+    public function getTheoricDataLength(FramePayload $framePayload): int
     {
         $payloadLen = $framePayload->getPayloadLength();
-        $lenSize = $framePayload->getLenSize();
-        $isMasked = $framePayload->isMasked();
-        $infoBytesLen = $this->getInfoBytesLen(lenSize: $lenSize, isMasked: $isMasked);
-        $frameSize = frameSize($data);
-        $theoricDataLength = $infoBytesLen + $payloadLen;
+        $infoBytesLen = GetInfoBytesLengthFunction::getInfoBytesLen(
+            lenSize: $framePayload->getLenSize(),
+            isMasked: $framePayload->isMasked()
+        );
 
-        if ($frameSize < $theoricDataLength) {
-            throw new IncompleteFrameException(
-                message:
-                sprintf(
-                    'Impossible to retrieve %s bytes of payload when the full frame is %s bytes long.',
-                    $theoricDataLength,
-                    $frameSize
-                )
-            );
-        }
-
-        if ($frameSize > $theoricDataLength) {
-            return BytesFromToStringFunction::getBytesFromToString(
-                frame: $data,
-                from: 0,
-                to: $theoricDataLength,
-                inspectionFrameEnum: InspectionFrameEnum::MODE_PHP
-            );
-        }
-
-        return $data;
+        return $infoBytesLen + $payloadLen;
     }
 }
 

@@ -14,15 +14,18 @@ namespace Nekland\Woketo\Rfc6455\FrameHandler;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
+use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
+use Kit\Websocket\Message\Message;
+use Kit\Websocket\Message\MessageProcessor;
 use React\Socket\ConnectionInterface;
 use function Kit\Websocket\functions\frameSize;
 
-class CloseFrameHandler implements Rfc6455FrameHandlerInterface
+class CloseFrameHandler implements FrameHandlerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function supports(Message $message)
+    public function supports(Message $message): bool
     {
         return $message->getFirstFrame()->getOpcode() === FrameTypeEnum::Close;
     }
@@ -30,41 +33,34 @@ class CloseFrameHandler implements Rfc6455FrameHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function process(Message $message, MessageProcessor $messageProcessor, ConnectionInterface $socket)
+    public function process(Message $message, MessageProcessor $messageProcessor, ConnectionInterface $socket): void
     {
-        /**
-         * @var Frame
-         */
         $frame = $message->getFirstFrame();
         $code = $this->getCloseType($frame);
-
-
         $messageProcessor->write($messageProcessor->getFrameFactory()->createCloseFrame($code), $socket);
         $socket->end();
     }
 
     private function getCloseType(Frame $frame): CloseFrameEnum
     {
-        $metadata = $frame->metadata;
+        $metadata = $frame->getMetadata();
         $payload = $frame->getPayload();
 
-        if ($metadata->rsv1 || $metadata->rsv2 || $metadata->rsv3) {
+        if ($metadata->isUnsupportedExtension()) {
             return CloseFrameEnum::CLOSE_PROTOCOL_ERROR;
         }
 
+
         if (frameSize($payload) > 1) {
-            $errorCode = (0 << 8) + \ord($payload[0]);
+            $errorCode = ord($payload[0]) & 0xFF;
             $existingCode = CloseFrameEnum::tryFrom($errorCode);
-            $invalidCodeRange = $errorCode < 1000 || $errorCode > 4999;
-            $isWebsocketCode = $errorCode > 1000 || $errorCode < 2999;
+            $isValidRange = $errorCode >= 1000 && $errorCode <= 4999;
+            $isWebsocketCode = $errorCode >= 1000 && $errorCode < 3000;
 
             // https://tools.ietf.org/html/rfc6455#section-7.4
-            if (
+            $validCode = !is_null($existingCode) && $isValidRange && $isWebsocketCode;
 
-                is_null($existingCode)
-                && !$isWebsocketCode
-                || $invalidCodeRange
-            ) {
+            if (!$validCode) {
                 return CloseFrameEnum::CLOSE_PROTOCOL_ERROR;
             }
         }

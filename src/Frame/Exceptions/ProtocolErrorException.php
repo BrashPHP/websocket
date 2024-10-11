@@ -8,5 +8,4 @@ use Kit\Websocket\Exceptions\WebSocketException;
 
 class ProtocolErrorException extends WebSocketException
 {
-
 }

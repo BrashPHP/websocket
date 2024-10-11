@@ -12,7 +12,7 @@ use Kit\Websocket\Message\Exceptions\WrongEncodingException;
 use function Kit\Websocket\functions\removeStart;
 
 
-class Message
+final class Message
 {
     /**
      * It allows ~50MiB buffering as the default of Frame content is 0.5MB
@@ -25,20 +25,16 @@ class Message
     private array $frames;
     private bool $isComplete;
     private string $buffer;
+    private int $maxMessagesBuffering;
 
-    /**
-     * @see Message::setConfig() for full default configuration.
-     *
-     * @var array
-     */
-    private $config;
+    private bool $isContinuationMessage = false;
 
-    public function __construct(array $config = [])
+    public function __construct(?int $maxMessagesBuffering = null)
     {
         $this->frames = [];
         $this->isComplete = false;
         $this->buffer = '';
-        $this->setConfig($config);
+        $this->maxMessagesBuffering = $maxMessagesBuffering ?? self::MAX_MESSAGES_BUFFERING;
     }
 
     public function addBuffer($data)
@@ -56,35 +52,25 @@ class Message
         return $this->buffer;
     }
 
-    /**
-     * Remove data from the start of the buffer.
-     *
-     * @param \Kit\Websocket\Frame\Frame $frame
-     * @return string
-     */
     public function removeFromBuffer(Frame $frame): string
     {
-        $this->buffer = removeStart($this->getBuffer(), $frame->getRawData());
+        $this->buffer = removeStart($this->buffer, $frame->getRawData());
 
         return $this->buffer;
     }
 
     /**
-     * @param Frame $frame
-     * @return Message
      * @throws \InvalidArgumentException
-     * @throws LimitationException
-     * @throws WrongEncodingException
      */
-    public function addFrame(Frame $frame): Message
+    public function addFrame(Frame $frame): ?\Exception
     {
         if ($this->isComplete) {
             throw new \InvalidArgumentException('The message is already complete.');
         }
 
-        if (count($this->frames) > $this->config['maxMessagesBuffering']) {
-            throw new LimitationException(
-                sprintf('We don\'t accept more than %s frames by message. This is a security limitation.', $this->config['maxMessagesBuffering'])
+        if (count($this->frames) > $this->maxMessagesBuffering) {
+            return new LimitationException(
+                sprintf('We don\'t accept more than %s frames by message. This is a security limitation.', $this->maxMessagesBuffering)
             );
         }
 
@@ -92,10 +78,10 @@ class Message
         $this->frames[] = $frame;
 
         if ($this->isComplete() && !$this->validDataEncoding()) {
-            throw new WrongEncodingException('The text is not encoded in UTF-8.');
+            return new WrongEncodingException('The text is not encoded in UTF-8.');
         }
 
-        return $this;
+        return null;
     }
 
     /**
@@ -182,12 +168,13 @@ class Message
         return \count($this->frames);
     }
 
-    public function setConfig(array $config = []): static
+    public function makeItContinuationMessage(): void
     {
-        $this->config = \array_merge([
-            'maxMessagesBuffering' => Message::MAX_MESSAGES_BUFFERING
-        ], $config);
+        $this->isContinuationMessage = true;
+    }
 
-        return $this;
+    public function isContinuationMessage(): bool
+    {
+        return $this->isContinuationMessage;
     }
 }
