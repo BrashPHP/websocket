@@ -12,6 +12,7 @@ use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
 use Kit\Websocket\Message\Message;
 use Kit\Websocket\Message\MessageProcessor;
 use React\Socket\ConnectionInterface;
+
 use function Kit\Websocket\functions\hexArrayToString;
 
 function createSut(): MessageProcessor
@@ -224,7 +225,7 @@ test('Should throw incomplete message and specify incomplete message', function 
     expect($messages[0]->isComplete())->toBeFalse();
 });
 
-test('Should testItProcessesOnePingBetweenTwoFragmentedTextMessages', function () {
+test('Should should process ping between two text frames', function () {
     // bin-frame containing :
     // 1- partial text ws-frame (containing fragment1)
     // 2- ping ws-frame (containing ping payload)
@@ -300,41 +301,75 @@ test('Should testItProcessesOnePingBetweenTwoFragmentedTextMessages', function (
     expect($messages[1]->getFrames())->toHaveCount(2);
 });
 
-// test('Should testItCatchesWrongContinutionFrameException', function () {
-//     $this->frameFactory
-//         ->expects($this->once())
-//         ->method('createCloseFrame')
-//         ->with($this->equalTo(Frame::CLOSE_PROTOCOL_ERROR))
-//         ->will($this->returnValue(new Frame(BitManipulation::hexArrayToString(['88', '02', '03', 'ef']))))
-//     ;
-//     $processor = new MessageProcessor(false, $this->frameFactory);
+test('Should catch wrong continuation frame exception', function () {
+    /** @var ConnectionInterface|\Mockery\MockInterface */
+    $mockServer = mock(ConnectionInterface::class);
+    $frameFactory = new FrameFactory();
+    $processor = new MessageProcessor($frameFactory, $mockServer);
+    $closeFrame = $frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
+    $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
+    $mockServer->shouldReceive('end')->withAnyArgs();
 
-//     $messages = iterator_to_array($processor->process(
-//         hexArrayToString(['80', '98', '53', '3d', 'b9', 'b3', '3d', '52', 'd7', '9e', '30', '52', 'd7', 'c7', '3a', '53', 'cc', 'd2', '27', '54', 'd6', 'dd', '73', '4d', 'd8', 'ca', '3f', '52', 'd8', 'd7']),
-//     ));
+    $messages = iterator_to_array($processor->process(
+        hexArrayToString(['80', '98', '53', '3d', 'b9', 'b3', '3d', '52', 'd7', '9e', '30', '52', 'd7', 'c7', '3a', '53', 'cc', 'd2', '27', '54', 'd6', 'dd', '73', '4d', 'd8', 'ca', '3f', '52', 'd8', 'd7']),
+    ));
 
-//     $this->assertSame([], $messages);
-// });
+    expect($messages)->toBeEmpty();
+});
 
-// test('Should testItCatchesWrongTextFragmentedFrameException()
-// {
-//     $multipleFrameData = BitManipulation::hexArrayToString([
-//         '01','89','b1','62','d1','9d','d7','10','b0','fa','dc','07','bf','e9','81', // first frame
-//         '81','8c','0e','be','06','0d','7e','d7','68','6a','2e','ce','67','74','62','d1','67','69','80' // second frame
-//     ]);
+test(
+    'Should catch wrong text fragmented frame exception',
+    function () {
+        $multipleFrameData = hexArrayToString([
+            '01',
+            '89',
+            'b1',
+            '62',
+            'd1',
+            '9d',
+            'd7',
+            '10',
+            'b0',
+            'fa',
+            'dc',
+            '07',
+            'bf',
+            'e9',
+            '81', // first frame
+            '81',
+            '8c',
+            '0e',
+            'be',
+            '06',
+            '0d',
+            '7e',
+            'd7',
+            '68',
+            '6a',
+            '2e',
+            'ce',
+            '67',
+            '74',
+            '62',
+            'd1',
+            '67',
+            '69',
+            '80' // second frame
+        ]);
 
-//     $this->frameFactory
-//         ->expects($this->once())
-//         ->method('createCloseFrame')
-//         ->with($this->equalTo(Frame::CLOSE_PROTOCOL_ERROR))
-//         ->will($this->returnValue(new Frame(BitManipulation::hexArrayToString(['88','02','03','ef']))))
-//     ;
-//     $processor = new MessageProcessor(false, $this->frameFactory);
+        /** @var ConnectionInterface|\Mockery\MockInterface */
+        $mockServer = mock(ConnectionInterface::class);
+        $frameFactory = new FrameFactory();
+        $processor = new MessageProcessor($frameFactory, $mockServer, maxMessagesBuffering: 2);
+        $closeFrame = $frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
+        $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
+        $mockServer->shouldReceive('end')->withAnyArgs();
 
-//     $messages = iterator_to_array($processor->onData(
-//         $multipleFrameData,
-//         $this->socket->reveal()
-//     ));
 
-//     $this->assertSame([], $messages);
-// }
+        $messages = iterator_to_array($processor->process(
+            $multipleFrameData,
+        ));
+
+        expect($messages)->toBeEmpty();
+    }
+);
