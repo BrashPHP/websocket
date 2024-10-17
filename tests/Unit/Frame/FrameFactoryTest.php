@@ -10,14 +10,14 @@ use Kit\Websocket\Message\Message;
 
 use function Kit\Websocket\functions\hexArrayToString;
 
-test('Should create close frame', function () {
+test('Should create close frame', function (): void {
     $factory = new FrameFactory();
     $frame = $factory->createCloseFrame(CloseFrameEnum::CLOSE_NORMAL);
 
     expect($frame->getRawData())->toEqual(hexArrayToString(['88', '02', '03', 'E8']));
 });
 
-test('Should create pong frame', function () {
+test('Should create pong frame', function (): void {
     $pingMessage = new Message();
     $hexStr = hexArrayToString(['89', '00']);
     $frameBuilt = (new FrameFactory(maxPayloadSize: 50000))->newFrameFromRawData($hexStr);

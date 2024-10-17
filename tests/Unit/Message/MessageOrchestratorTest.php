@@ -8,7 +8,7 @@ use Kit\Websocket\Message\MessageBus;
 use Kit\Websocket\Message\MessageOrchestrator;
 use function Kit\Websocket\functions\hexArrayToString;
 
-test('Should build message correctly', function ()  {
+test('Should build message correctly', function (): void  {
     $processor = new MessageOrchestrator(new FrameFactory());
     $data = hexArrayToString(['81', '05', '48', '65', '6c', '6c', '6f']);
     $messageBus = new MessageBus($data);

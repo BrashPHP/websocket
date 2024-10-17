@@ -25,7 +25,7 @@ function createSut(): MessageProcessor
     return new MessageProcessor(new FrameFactory(), $mockServer);
 }
 
-test('should build many messages with only one frame data', function () {
+test('should build many messages with only one frame data', function (): void {
     $multipleFrameData = hexArrayToString(
         [
             '01',
@@ -58,7 +58,7 @@ test('should build many messages with only one frame data', function () {
     expect($messages[1]->getContent())->toEqual('Hello');
 });
 
-test('Should receive ContinueFrameEvaluation After Control Frame', function () {
+test('Should receive ContinueFrameEvaluation After Control Frame', function (): void {
     $multipleFrameData = hexArrayToString(
         [
             '89',
@@ -91,7 +91,7 @@ test('Should receive ContinueFrameEvaluation After Control Frame', function () {
     expect($messages[2]->getFirstFrame()->getOpcode())->toEqual(FrameTypeEnum::Ping, );
 });
 
-test('Should test if build partial message', function () {
+test('Should test if build partial message', function (): void {
     $processor = createSut();
 
     $messages = iterator_to_array($processor->process(
@@ -112,7 +112,7 @@ test('Should test if build partial message', function () {
     expect($messages[0]->getContent())->toEqual('Hello');
 });
 
-test('Should build only complete messages', function () {
+test('Should build only complete messages', function (): void {
     $sut = createSut();
     $messages = iterator_to_array($sut->process(
         // "Hel" and "lo" normal frame unmasked
@@ -122,7 +122,7 @@ test('Should build only complete messages', function () {
 });
 
 
-test('Should handle special messages with handler', function () {
+test('Should handle special messages with handler', function (): void {
     $processor = createSut();
     $anonymousHandler = new class () implements FrameHandlerInterface {
         public function supports(Message $message): bool
@@ -145,7 +145,7 @@ test('Should handle special messages with handler', function () {
 });
 
 
-test('Should assure that writes frames', function () {
+test('Should assure that writes frames', function (): void {
     /** @var ConnectionInterface|\Mockery\MockInterface */
     $mockServer = mock(ConnectionInterface::class);
     $expectedString = hexArrayToString(['81', '05', '48', '65', '6c', '6c', '6f']);
@@ -157,7 +157,7 @@ test('Should assure that writes frames', function () {
     $processor->write('Hello');
 });
 
-test('Should achieve a limitation exception due to large message', function () {
+test('Should achieve a limitation exception due to large message', function (): void {
     /** @var ConnectionInterface|\Mockery\MockInterface */
     $mockServer = mock(ConnectionInterface::class);
     $frameFactory = new FrameFactory();
@@ -177,7 +177,7 @@ test('Should achieve a limitation exception due to large message', function () {
     expect($messages)->toBeEmpty();
 });
 
-test('Should support message in many frames', function () {
+test('Should support message in many frames', function (): void {
     $multipleFrameData = hexArrayToString(
         [
             '01',
@@ -215,7 +215,7 @@ test('Should support message in many frames', function () {
     $this->assertCount(2, $messages[0]->getFrames());
 });
 
-test('Should throw incomplete message and specify incomplete message', function () {
+test('Should throw incomplete message and specify incomplete message', function (): void {
     $incompleteFrame = hexArrayToString(['81', '85', '37', 'fa', '21', '3d']);
     $processor = createSut();
     $messages = iterator_to_array($processor->process(
@@ -225,7 +225,7 @@ test('Should throw incomplete message and specify incomplete message', function 
     expect($messages[0]->isComplete())->toBeFalse();
 });
 
-test('Should should process ping between two text frames', function () {
+test('Should should process ping between two text frames', function (): void {
     // bin-frame containing :
     // 1- partial text ws-frame (containing fragment1)
     // 2- ping ws-frame (containing ping payload)
@@ -301,7 +301,7 @@ test('Should should process ping between two text frames', function () {
     expect($messages[1]->getFrames())->toHaveCount(2);
 });
 
-test('Should catch wrong continuation frame exception', function () {
+test('Should catch wrong continuation frame exception', function (): void {
     /** @var ConnectionInterface|\Mockery\MockInterface */
     $mockServer = mock(ConnectionInterface::class);
     $frameFactory = new FrameFactory();
@@ -319,7 +319,7 @@ test('Should catch wrong continuation frame exception', function () {
 
 test(
     'Should catch wrong text fragmented frame exception',
-    function () {
+    function (): void {
         $multipleFrameData = hexArrayToString([
             '01',
             '89',

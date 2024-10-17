@@ -19,7 +19,7 @@ function getLength(string $rawData): PayloadLengthDto
     return $payloadLengthCalculator->getPayloadLength($secondByte);
 }
 
-test('Should extract masked payload based on first bit from byte string', function () {
+test('Should extract masked payload based on first bit from byte string', function (): void {
     $sut = createSut();
     $byteString = chr(128); //10000000
     $payload = "0{$byteString}11ABF";
@@ -30,7 +30,7 @@ test('Should extract masked payload based on first bit from byte string', functi
     expect($result->getMaskingKey())->toEqual("11AB");
 });
 
-test('Should extract unmasked payload based on first bit from byte string', function () {
+test('Should extract unmasked payload based on first bit from byte string', function (): void {
     $sut = createSut();
     $byteString = chr(3); //00000011
     $payload = "0{$byteString}11ABF";
@@ -40,7 +40,7 @@ test('Should extract unmasked payload based on first bit from byte string', func
     expect($result->isMasked())->toBeFalse();
 });
 
-test('Should extract masked payload data using second byte', function () {
+test('Should extract masked payload data using second byte', function (): void {
     $sut = createSut();
     $byteString = chr(130); //10000111
     $payload = "0{$byteString}11ABFFFF";
@@ -52,7 +52,7 @@ test('Should extract masked payload data using second byte', function () {
     expect($result->getPayload())->not->toEqual("FFF");
 });
 
-test('Should extract unmasked payload data using second byte', function () {
+test('Should extract unmasked payload data using second byte', function (): void {
     $sut = createSut();
     $byteString = chr(8); //00001000
     $payload = "0{$byteString}11ABFFF";
