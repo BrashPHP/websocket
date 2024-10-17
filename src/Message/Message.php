@@ -9,7 +9,6 @@ use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Message\Exceptions\LimitationException;
 use Kit\Websocket\Message\Exceptions\MissingDataException;
 use Kit\Websocket\Message\Exceptions\WrongEncodingException;
-use function Kit\Websocket\functions\removeStart;
 
 
 final class Message
@@ -24,7 +23,6 @@ final class Message
      */
     private array $frames;
     private bool $isComplete;
-    private string $buffer;
     private int $maxMessagesBuffering;
 
     private bool $isContinuationMessage = false;
@@ -33,30 +31,7 @@ final class Message
     {
         $this->frames = [];
         $this->isComplete = false;
-        $this->buffer = '';
         $this->maxMessagesBuffering = $maxMessagesBuffering ?? self::MAX_MESSAGES_BUFFERING;
-    }
-
-    public function addBuffer($data)
-    {
-        $this->buffer .= $data;
-    }
-
-    public function clearBuffer()
-    {
-        $this->buffer = '';
-    }
-
-    public function getBuffer(): string
-    {
-        return $this->buffer;
-    }
-
-    public function removeFromBuffer(Frame $frame): string
-    {
-        $this->buffer = removeStart($this->buffer, $frame->getRawData());
-
-        return $this->buffer;
     }
 
     /**
@@ -70,7 +45,11 @@ final class Message
 
         if (count($this->frames) > $this->maxMessagesBuffering) {
             return new LimitationException(
-                sprintf('We don\'t accept more than %s frames by message. This is a security limitation.', $this->maxMessagesBuffering)
+                sprintf(
+                    'We don\'t accept more than %s frames by message. This is a security limitation. Currently %d frames',
+                    $this->maxMessagesBuffering,
+                    count($this->frames)
+                )
             );
         }
 
@@ -100,7 +79,6 @@ final class Message
     }
 
     /**
-     * @return Frame
      * @throws MissingDataException
      */
     public function getFirstFrame(): Frame

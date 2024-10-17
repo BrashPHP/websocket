@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Frame;
 
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\FrameBuilder;
 use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Message\Message;
 
@@ -21,7 +20,7 @@ test('Should create close frame', function () {
 test('Should create pong frame', function () {
     $pingMessage = new Message();
     $hexStr = hexArrayToString(['89', '00']);
-    $frameBuilt = (new FrameBuilder(maxPayloadSize: 50000))->build($hexStr);
+    $frameBuilt = (new FrameFactory(maxPayloadSize: 50000))->newFrameFromRawData($hexStr);
     $pingMessage->addFrame($frameBuilt);
     $factory = new FrameFactory();
     $message = $pingMessage->getContent();

@@ -25,7 +25,6 @@ class Frame
         private FrameTypeEnum $opcode,
         private FrameMetadata $metadata,
         private FramePayload $framePayload,
-        private int $maxPayloadSize
     ) {
     }
 
@@ -63,7 +62,7 @@ class Frame
             $data .= $this->framePayload->getMaskingKey();
         }
 
-        $data .= $this->framePayload->getPayload();
+        $data .= $this->framePayload->getRawPayload();
 
         return $data;
     }
@@ -93,7 +92,7 @@ class Frame
      *
      * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         $payload = $this->getPayload();
         if ($this->getOpcode() === FrameTypeEnum::Text || $this->getOpcode() === FrameTypeEnum::Binary) {

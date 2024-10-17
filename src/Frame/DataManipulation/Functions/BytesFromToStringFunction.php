@@ -6,7 +6,7 @@ namespace Kit\Websocket\Frame\DataManipulation\Functions;
 
 use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
 
-final class BytesFromToStringFunction 
+final class BytesFromToStringFunction
 {
     /**
      * Proxy to the substr to be sure to be use the right method (mb_substr)

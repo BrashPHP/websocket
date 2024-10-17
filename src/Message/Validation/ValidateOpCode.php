@@ -10,25 +10,21 @@ use Kit\Websocket\Message\Message;
 
 final class ValidateOpCode extends AbstractMessageValidator
 {
-
-    public function __construct(private ValidationUponOpCode $validationUponOpCode)
-    {
-
-    }
-
     public function validate(Message $message, Frame $frame): ValidationResult
     {
-        $result = $this->validationUponOpCode->validate($frame);
+        $validation = new ValidationUponOpCode();
+        $result = $validation->validate($frame);
 
         if (is_null($result)) {
             if ($frame->isControlFrame() && $message->hasFrames()) {
                 $controlFrameMessage = new Message();
                 $controlFrameMessage->addFrame($frame);
+                $controlFrameMessage->makeItContinuationMessage();
 
                 return new ValidationResult($controlFrameMessage);
             }
             
-            return $this->nextHandler->validate($message, $frame);
+            return parent::validate($message, $frame);
         }
 
         return new ValidationResult(error: $result);

@@ -37,7 +37,7 @@ class CloseFrameHandler implements FrameHandlerInterface
     {
         $frame = $message->getFirstFrame();
         $code = $this->getCloseType($frame);
-        $messageProcessor->write($messageProcessor->getFrameFactory()->createCloseFrame($code), $socket);
+        $messageProcessor->write($messageProcessor->getFrameFactory()->createCloseFrame($code));
         $socket->end();
     }
 

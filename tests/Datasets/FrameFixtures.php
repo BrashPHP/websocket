@@ -3,16 +3,18 @@
 namespace Tests\Datasets;
 use function Kit\Websocket\functions\hexArrayToString;
 
+$invalidArgumentExceptionClass = '\InvalidArgumentException';
+
 dataset(name: 'frameProvider', dataset: [
     [16711850, 2, 2, false, 170],
     [16711850, 0, 1, false, 65280],
     [16711850, 0, 2, false, 16711850],
-    [-16711850, 1, 2, false, '\InvalidArgumentException'],
-    [16711850, 1, 3, false, '\InvalidArgumentException'],
+    [-16711850, 1, 2, false, $invalidArgumentExceptionClass ],
+    [16711850, 1, 3, false, $invalidArgumentExceptionClass ],
     ['abcdef', 1, 2, false, 25187],
     ['abcdef', 1, 3, false, 6447972],
-    ['abc', 2, 5, false, '\InvalidArgumentException'],
-    ['abc', 1, 3, false, '\InvalidArgumentException'],
+    ['abc', 2, 5, false, $invalidArgumentExceptionClass ],
+    ['abc', 1, 3, false, $invalidArgumentExceptionClass ],
     ['abc', 0, 0, false, 97],
     [
         hexArrayToString(

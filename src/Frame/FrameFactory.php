@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Kit\Websocket\Frame;
 
+use Kit\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
+use Kit\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
+use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
 use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;
 use Kit\Websocket\Frame\FrameBuilder;
-use Kit\Websocket\Result\Result;
+
+use Kit\Websocket\Message\Exceptions\LimitationException;
+use function Kit\Websocket\functions\frameSize;
 use function Kit\Websocket\functions\intToBinaryString;
 
 /**
@@ -22,6 +27,7 @@ use function Kit\Websocket\functions\intToBinaryString;
 class FrameFactory
 {
     private FrameBuilder $frameBuilder;
+    private PayloadLengthCalculator $payloadLengthCalculator;
 
     /**
      * (0.5MiB) Adjust if needed.
@@ -31,15 +37,67 @@ class FrameFactory
 
     public function __construct(private int $maxPayloadSize = 524288)
     {
-        $this->frameBuilder = new FrameBuilder(maxPayloadSize: $maxPayloadSize);
+        $this->frameBuilder = new FrameBuilder();
+        $this->payloadLengthCalculator = new PayloadLengthCalculator();
     }
 
     /**
      * Returns a new frame if everything succeeds, otherwise throws an exception
      */
-    public function newFrameFromRawData(string $rawData): Frame|IncompleteFrameException
+    public function newFrameFromRawData(string $rawData): Frame|\Exception
     {
-        return $this->frameBuilder->build($rawData);
+        $payloadLengthDto = $this->getPayloadLengthFromRawData($rawData);
+
+        if (\strlen($rawData) < $payloadLengthDto->threshold + 1) {
+            return new IncompleteFrameException(
+                'Impossible to determine the length of the frame because message is too small.'
+            );
+        }
+
+        $frame = $this->frameBuilder->build($rawData, $payloadLengthDto);
+        $framePayload = $frame->getFramePayload();
+        $payloadLen = $framePayload->getPayloadLength();
+
+        if ($payloadLen < 0 || $payloadLen > $this->maxPayloadSize) {
+            return new LimitationException('The frame is too big to be processed.');
+        }
+
+        $frameSize = frameSize($rawData);
+
+        $theoricDataLength = $framePayload->getTheoricDataLength();
+
+        return match ($frameSize <=> $theoricDataLength) {
+            0 => $frame,
+            1 => $this->newFrameFromRawData(
+                $this->truncateRawData(
+                    $rawData,
+                    $theoricDataLength
+                )
+            ),
+            -1 => new IncompleteFrameException(
+                sprintf(
+                    'Impossible to retrieve %s bytes of payload when the full frame is %s bytes long.',
+                    $theoricDataLength,
+                    $frameSize
+                )
+            ),
+        };
+    }
+
+    public function getPayloadLengthFromRawData(string $rawData): PayloadLengthDto{
+        $secondByte = GetNthByteFunction::nthByte(frame: $rawData, byteNumber: 1);
+
+        return $this->payloadLengthCalculator->getPayloadLength($secondByte);
+    }
+
+    private function truncateRawData(string $rawData, int $theoricDataLength): string
+    {
+        return BytesFromToStringFunction::getBytesFromToString(
+            frame: $rawData,
+            from: 0,
+            to: $theoricDataLength,
+            inspectionFrameEnum: InspectionFrameEnum::MODE_PHP
+        );
     }
 
     public function newFrame(string $payload, FrameTypeEnum $frameTypeEnum, bool $writeMask): Frame

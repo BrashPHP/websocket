@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 namespace Kit\Websocket\Message\Validation;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Exceptions\ProtocolErrorException;
 use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Message\Message;
 
@@ -14,8 +12,12 @@ final class CanIncludeFrame extends AbstractMessageValidator
     {
         $exception = $message->addFrame($frame);
 
+        if ($message->isContinuationMessage()) {
+            return new ValidationResult($message);
+        }
+
         if (is_null($exception)) {
-            return $this->nextHandler->validate($message, $frame);
+            return parent::validate($message, $frame);
         }
         
         return new ValidationResult(error: $exception);

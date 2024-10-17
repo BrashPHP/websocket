@@ -16,11 +16,11 @@ readonly class PayloadLengthDto
     }
 
     public function getRealLength(string $rawData){
-        $defaultStartByte = 2;
-
         if ($this->length < 126) {
             return $this->length;
         }
+        
+        $defaultStartByte = 2;
 
         return ByteSequenceFunction::bytesFromTo(
             frame: $rawData,

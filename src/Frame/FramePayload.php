@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Kit\Websocket\Frame;
+use Kit\Websocket\Frame\DataManipulation\Functions\GetInfoBytesLengthFunction;
 
 /**
  * Frame Payload operations are contained within this class to provide granular acess to data functions and operations.
@@ -47,6 +48,11 @@ class FramePayload
         return $res;
     }
 
+    public function getRawPayload(): string
+    {
+        return $this->payload;
+    }
+
     public function getPayload(): string
     {
         if ($this->isMasked()) {
@@ -66,7 +72,8 @@ class FramePayload
         return $this->maskingKey;
     }
 
-    public function getLenSize(): int {
+    public function getLenSize(): int
+    {
         return $this->lenSize;
     }
 
@@ -76,7 +83,7 @@ class FramePayload
     public function getFirstLength(): int
     {
         $payloadLen = $this->payloadLen;
-        
+
         if ($payloadLen < 126) {
             return $payloadLen;
         }
@@ -102,5 +109,17 @@ class FramePayload
     public function isMasked(): bool
     {
         return $this->maskingKey !== '';
+    }
+
+    public function getTheoricDataLength(): int
+    {
+        $payloadLen = $this->payloadLen;
+
+        $infoBytesLen = GetInfoBytesLengthFunction::getInfoBytesLen(
+            lenSize: $this->lenSize,
+            isMasked: $this->isMasked()
+        );
+
+        return $infoBytesLen + $payloadLen;
     }
 }

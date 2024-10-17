@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Kit\Websocket\Frame\Exceptions;
 
-use Exception;
+use Kit\Websocket\Message\Exceptions\LimitationException;
 
-readonly class TooBigFrameException extends Exception
+class TooBigFrameException extends LimitationException
 {
     public function __construct(
         public int $maxLength,
-        public string $message = 'The frame is too big to be processed.'
+        public $message = 'The frame is too big to be processed.'
     ) {
     }
 

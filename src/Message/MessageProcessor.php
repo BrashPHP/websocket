@@ -6,6 +6,7 @@ namespace Kit\Websocket\Message;
 
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
+use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;
 use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
@@ -28,6 +29,7 @@ class MessageProcessor
 
     public function __construct(
         private FrameFactory $frameFactory,
+        private ConnectionInterface $socket,
         private bool $writeMasked = false,
         private ?int $maxMessagesBuffering = null
     ) {
@@ -40,28 +42,58 @@ class MessageProcessor
      * Handles ws-frames, bin-frames, and control frames with buffering logic.
      *
      */
-    public function process(string $data, ConnectionInterface $socket, Message $message): void
+    public function process(string $data, $unfinishedMessage = null)
     {
         $messageOrchestrator = new MessageOrchestrator($this->frameFactory);
+        $messageBus = new MessageBus($data);
+        $message = $unfinishedMessage;
         do {
             try {
                 $message ??= $this->createMessage();
-                $message = $messageOrchestrator->onData($data, $message);
+                $messageOrchestratorResponse = $messageOrchestrator->onData($messageBus, $message);
 
-                if (is_null($message)) {
-                    if ($messageOrchestrator->failed()) {
-                        $this->onException($messageOrchestrator->getCloseType(), $socket);
+                if ($messageOrchestrator->failed()) {
+                    $messageBus->setData('');
+
+                    if (!($messageOrchestrator->getError() instanceof IncompleteFrameException)) {
+                        $this->onException($messageOrchestrator->getCloseType());
+
                         break;
                     }
+                }
+
+                if ($messageOrchestratorResponse->isContinuationMessage()) {
+                    yield $messageOrchestratorResponse;
 
                     continue;
                 }
 
-                $this->processHelper($message, $socket);
+                if ($message->isComplete()) {
+                    $this->processHelper($message);
+
+                    yield $message;
+
+                    $message = null;
+                } else {
+                    yield $message;
+                }
+
             } catch (\Throwable $th) {
-                $this->onException(CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION, $socket);
+                $this->onException(CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION);
+
+                $messageBus->setData(null);
             }
-        } while (!empty($data));
+        } while ($messageBus->hasValidData());
+    }
+
+    public function withSocket(ConnectionInterface $connectionInterface): static
+    {
+        return new self(
+            $this->frameFactory,
+            $connectionInterface,
+            $this->writeMasked,
+            $this->maxMessagesBuffering
+        );
     }
 
     public function createMessage()
@@ -70,7 +102,7 @@ class MessageProcessor
     }
 
 
-    public function write(Frame|string $frame, ConnectionInterface $socket, FrameTypeEnum $opCode = FrameTypeEnum::Text): void
+    public function write(Frame|string $frame, FrameTypeEnum $opCode = FrameTypeEnum::Text): void
     {
         if (!$frame instanceof Frame) {
             $frame = $this->frameFactory->newFrame(
@@ -80,13 +112,18 @@ class MessageProcessor
             );
         }
 
-        $socket->write($frame->getRawData());
+        $this->socket->write($frame->getRawData());
     }
 
 
     public function getFrameFactory(): FrameFactory
     {
         return $this->frameFactory;
+    }
+
+    public function getProcessConnection(): ConnectionInterface
+    {
+        return $this->socket;
     }
 
     public function addHandler(FrameHandlerInterface $handler): static
@@ -98,32 +135,32 @@ class MessageProcessor
 
     public function timeout(ConnectionInterface $socket)
     {
-        $this->write($this->frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR), $socket);
+        $this->write($this->frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR));
         $socket->close();
     }
 
     public function close(
-        ConnectionInterface $socket,
         CloseFrameEnum $status = CloseFrameEnum::CLOSE_NORMAL,
         string $reason = null
     ): void {
-        $this->write($this->frameFactory->createCloseFrame($status, $reason), $socket);
+        $this->write($this->frameFactory->createCloseFrame($status, $reason));
 
-        $socket->end();
+        $this->socket->end();
     }
 
-    private function processHelper(Message $message, ConnectionInterface $socket): void
+    private function processHelper(Message $message): void
     {
         foreach ($this->handlers as $handler) {
             if ($handler->supports(message: $message)) {
-                $handler->process(message: $message, messageProcessor: $this, socket: $socket);
+                $handler->process(message: $message, messageProcessor: $this, socket: $this->socket);
             }
         }
     }
 
-    private function onException(CloseFrameEnum $closeCode, ConnectionInterface $socket)
+    private function onException(CloseFrameEnum $closeCode)
     {
-        $this->write($this->frameFactory->createCloseFrame(status: $closeCode), $socket);
-        $socket->end();
+        $closeFrame = $this->frameFactory->createCloseFrame(status: $closeCode);
+        $this->write($closeFrame);
+        $this->socket->end();
     }
 }

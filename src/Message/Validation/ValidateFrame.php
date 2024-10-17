@@ -23,7 +23,7 @@ final class ValidateFrame extends AbstractMessageValidator
         }
 
         if (is_null($exception)) {
-            return $this->nextHandler->validate($message, $frame);
+            return parent::validate($message, $frame);
         }
         
         return new ValidationResult(error: $exception);

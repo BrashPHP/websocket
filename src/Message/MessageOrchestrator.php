@@ -1,70 +1,80 @@
 <?php
 
-namespace Kit\Websocket\Message;
-
 declare(strict_types=1);
+
+namespace Kit\Websocket\Message;
 
 use Kit\Websocket\Exceptions\IncoherentDataException;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;
 use Kit\Websocket\Frame\Exceptions\ProtocolErrorException;
 use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Frame\FrameValidation\ValidationUponOpCode;
 use Kit\Websocket\Message\Exceptions\LimitationException;
 use Kit\Websocket\Message\Validation\AbstractMessageValidator;
 use Kit\Websocket\Message\Validation\CanIncludeFrame;
 use Kit\Websocket\Message\Validation\ValidateFrame;
 use Kit\Websocket\Message\Validation\ValidateOpCode;
+use function Kit\Websocket\functions\removeStart;
 
 final class MessageOrchestrator
 {
     private ?\Exception $preparedException;
-
     private AbstractMessageValidator $messageValidator;
+    private string $buffer;
 
     public function __construct(private FrameFactory $frameFactory)
     {
         $this->preparedException = null;
-        $this->messageValidator = new ValidateOpCode(new ValidationUponOpCode());
-        $this->messageValidator->setNext(new ValidateFrame())->setNext(new CanIncludeFrame());
+        $this->buffer = '';
+        $this->messageValidator = new ValidateOpCode();
+        $this->messageValidator
+            ->setNext(new ValidateFrame())
+            ->setNext(new CanIncludeFrame());
     }
 
-    public function onData(string &$data, Message $message): Message|null
+    public function onData(MessageBus $messageBus, Message $message): Message|null
     {
-        $message->addBuffer($data);
-        $incompleteMessage = fn(): bool => !$message->isComplete();
-        $noExceptionThrown = fn(): bool => is_null($this->preparedException);
+        $this->addBuffer($messageBus->getData());
+        $exception = null;
 
-        $canContinueCondition = fn(): bool => $data && $incompleteMessage() && $noExceptionThrown();
+        while (
+            $messageBus->hasValidData() &&
+            !$message->isComplete() &&
+            is_null($exception)
+        ) {
+            $frameOrFail = $this->frameFactory->newFrameFromRawData($this->getBuffer());
 
-        while ($canContinueCondition()) {
-            $frame = $this->frameFactory->newFrameFromRawData($message->getBuffer());
+            if ($frameOrFail instanceof \Exception) {
+                $exception = $frameOrFail;
 
-            if ($frame instanceof IncompleteFrameException) {
-                break;
+                continue;
             }
+
+            $frame = $frameOrFail;
 
             $result = $this->messageValidator->validate($message, $frame);
 
-            if (!$result->success()) {
-                $this->preparedException = $result->error;
+            if ($result->success()) {
+                $message = $result->successfulMessage;
+
+                $data = $this->removeFromBuffer($frame->getRawData());
+
+                $messageBus->setData($data);
+
+                continue;
             }
 
-            $message = $result->successfulMessage;
-
-            if ($message->isContinuationMessage()) {
-                return $message;
-            }
-
-            $data = $message->removeFromBuffer($frame);
+            $exception = $result->error;
         }
 
-        return $message->isComplete() ? $message : null;
+        $this->preparedException = $exception;
+
+        $this->clearBuffer();
+
+        return $message;
     }
 
-    public function failed()
+    public function failed(): bool
     {
         return !is_null($this->preparedException);
     }
@@ -77,5 +87,32 @@ final class MessageOrchestrator
             LimitationException::class => CloseFrameEnum::CLOSE_TOO_BIG_TO_PROCESS,
             default => CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION,
         };
+    }
+
+    public function addBuffer($data)
+    {
+        $this->buffer .= $data;
+    }
+
+    public function clearBuffer()
+    {
+        $this->buffer = '';
+    }
+
+    public function getBuffer(): string
+    {
+        return $this->buffer;
+    }
+
+    public function removeFromBuffer(string $rawData): string
+    {
+        $this->buffer = removeStart($this->buffer, $rawData);
+
+        return $this->buffer;
+    }
+
+    public function getError(): \Exception
+    {
+        return $this->preparedException;
     }
 }

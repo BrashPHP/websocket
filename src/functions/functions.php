@@ -15,7 +15,7 @@ if (!function_exists('println')) {
 if (!function_exists('removeStart')) {
     function removeStart(string $str, string $toRemove): string
     {
-        if (startsWith($str, $toRemove)) {
+        if (!startsWith($str, $toRemove)) {
             return $str;
         }
         $sizeToRemove = strlen($toRemove);
