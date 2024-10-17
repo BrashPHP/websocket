@@ -7,7 +7,7 @@ use Kit\Websocket\Frame\PayloadLengthCalculator;
 use Kit\Websocket\Frame\PayloadLengthDto;
 
 
-function createSut()
+function createSut(): FrameBuilder
 {
     return new FrameBuilder();
 }
