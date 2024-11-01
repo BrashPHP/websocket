@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Kit\Websocket\Message;
 
+use Generator;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;
 use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
 use Kit\Websocket\Message\Message;
+use Kit\Websocket\Message\Orchestration\MessageOrchestrator;
 use React\Socket\ConnectionInterface;
 
 /**
@@ -26,6 +27,7 @@ class MessageProcessor
      * @var FrameHandlerInterface[]
      */
     private array $handlers;
+    private MessageOrchestrator $messageOrchestrator;
 
     public function __construct(
         private FrameFactory $frameFactory,
@@ -33,6 +35,7 @@ class MessageProcessor
         private bool $writeMasked = false,
         private ?int $maxMessagesBuffering = null
     ) {
+        $this->messageOrchestrator = new MessageOrchestrator($this->frameFactory);
         $this->writeMasked = $writeMasked;
         $this->handlers = [];
     }
@@ -41,32 +44,36 @@ class MessageProcessor
      * Process socket data to generate and handle a `Message` entity.
      * Handles ws-frames, bin-frames, and control frames with buffering logic.
      *
+     * Always returns a Message, whether complete or incomplete.
+     *
+     * @return Generator<Message>
      */
-    public function process(string $data, $unfinishedMessage = null)
+    public function process(string $data, $unfinishedMessage = null): Generator
     {
-        $messageOrchestrator = new MessageOrchestrator($this->frameFactory);
         $messageBus = new MessageBus($data);
         $message = $unfinishedMessage;
         do {
             try {
                 $message ??= $this->createMessage();
-                $messageOrchestratorResponse = $messageOrchestrator->onData($messageBus, $message);
+                $response = $this->messageOrchestrator->conduct($messageBus, $message);
 
-                if ($messageOrchestrator->failed()) {
+                if ($response->failed()) {
                     $messageBus->setData('');
 
-                    if (!($messageOrchestrator->getError() instanceof IncompleteFrameException)) {
-                        $this->onException($messageOrchestrator->getCloseType());
+                    if (!$response->isIncompleteException()) {
+                        $this->onException($response->getCloseType());
 
                         break;
                     }
                 }
 
-                if ($messageOrchestratorResponse->isContinuationMessage()) {
-                    yield $messageOrchestratorResponse;
+                if ($response->successfullMessage->isContinuationMessage()) {
+                    yield $response->successfullMessage;
 
                     continue;
                 }
+
+                $message = $response->successfullMessage;
 
                 if ($message->isComplete()) {
                     $this->processHelper($message);
@@ -133,10 +140,10 @@ class MessageProcessor
         return $this;
     }
 
-    public function timeout(ConnectionInterface $socket)
+    public function timeout(): void
     {
         $this->write($this->frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR));
-        $socket->close();
+        $this->socket->close();
     }
 
     public function close(

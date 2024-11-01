@@ -1,15 +1,8 @@
 <?php
-/**
- * This file is a part of Woketo package.
- *
- * (c) Nekland <dev@nekland.fr>
- *
- * For the full license, take a look to the LICENSE file
- * on the root directory of this project
- */
+
+declare(strict_types=1);
 
 namespace Kit\Websocket\Frame\Handlers;
-
 
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;

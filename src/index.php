@@ -5,7 +5,7 @@ use React\EventLoop\Loop;
 use React\Socket\SocketServer;
 use Revolt\EventLoop\React\Internal\EventLoopAdapter;
 
-require "vendor/autoload.php";
+require_once "vendor/autoload.php";
 
 Loop::set(EventLoopAdapter::get());
 

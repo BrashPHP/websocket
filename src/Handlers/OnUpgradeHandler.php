@@ -2,40 +2,45 @@
 
 namespace Kit\Websocket\Handlers;
 
-
-use Kit\Websocket\Events\OnUpgradeEvent;
-use Kit\Websocket\Events\Protocols\Event;
-use Kit\Websocket\Events\Protocols\ListenerInterface;
+use Kit\Websocket\Http\RequestVerifier;
 use Kit\Websocket\Utilities\HandshakeResponder;
 use Kit\Websocket\Utilities\KeyDigest;
-use React\Socket\ConnectionInterface;
+use Psr\Http\Message\RequestInterface;
+use React\Promise\Promise;
 
-/**
- * @template-implements ListenerInterface<OnUpgradeEvent>
- */
-final class OnUpgradeHandler implements ListenerInterface
+final class OnUpgradeHandler
 {
-    public function __construct(private ConnectionInterface $connectionInterface)
+    private RequestVerifier $requestVerifier;
+    private HandshakeResponder $handshakeResponder;
+    private KeyDigest $keyDigest;
+
+    public function __construct()
     {
+        $this->requestVerifier = new RequestVerifier();
+        $this->handshakeResponder = new HandshakeResponder();
+        $this->keyDigest = new KeyDigest();
     }
 
-
-    /**
-     * Summary of execute
-     * @param \Kit\Websocket\Events\OnUpgradeEvent $subject
-     *
-     * @return void
-     */
-    public function execute(Event $subject): void
+    public function execute(RequestInterface $request): Promise
     {
-        $request = $subject->request;
-        $secWebsocketKeyHeaders = $request->getHeader('sec-websocket-key');
-        if (count($secWebsocketKeyHeaders)) {
-            $secWebsocketKey = array_pop($secWebsocketKeyHeaders);
-            $responder = new HandshakeResponder();
-            $keyCreator = new KeyDigest();
-            $handshakeResponder = $responder->prepareHandshakeResponse($keyCreator->createSocketAcceptKey($secWebsocketKey));
-            $this->connectionInterface->write($handshakeResponder);
-        }
+        return new Promise(
+            resolver: function (callable $resolve, callable $reject) use ($request) {
+                $result = $this->requestVerifier->verify($request);
+                if (is_null($result)) {
+                    $secWebsocketKeyHeaders = $request->getHeader('sec-websocket-key');
+                    if (count($secWebsocketKeyHeaders)) {
+                        $secWebsocketKey = array_pop($secWebsocketKeyHeaders);
+
+                        $handshakeResponse = $this->handshakeResponder->prepareHandshakeResponse(
+                            acceptKey: $this->keyDigest->createSocketAcceptKey($secWebsocketKey)
+                        );
+
+                        return $resolve($handshakeResponse);
+                    }
+                }
+
+                return $reject($result);
+            }
+        );
     }
 }

@@ -4,7 +4,7 @@ namespace Kit\Websocket\Utilities;
 
 final class HandshakeResponder
 {
-    public function prepareHandshakeResponse(string $acceptKey)
+    public function prepareHandshakeResponse(string $acceptKey): string
     {
         $lineSeparator = '\r\n';
 

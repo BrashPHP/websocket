@@ -2,29 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message;
+namespace Kit\Websocket\Message\Orchestration;
 
-use Kit\Websocket\Exceptions\IncoherentDataException;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Exceptions\ProtocolErrorException;
-use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Exceptions\LimitationException;
+use Kit\Websocket\Message\Message;
+use Kit\Websocket\Message\MessageBus;
 use Kit\Websocket\Message\Validation\AbstractMessageValidator;
 use Kit\Websocket\Message\Validation\CanIncludeFrame;
 use Kit\Websocket\Message\Validation\ValidateFrame;
 use Kit\Websocket\Message\Validation\ValidateOpCode;
+
 use function Kit\Websocket\functions\removeStart;
 
 final class MessageOrchestrator
 {
-    private ?\Exception $preparedException;
     private AbstractMessageValidator $messageValidator;
     private string $buffer;
 
     public function __construct(private FrameFactory $frameFactory)
     {
-        $this->preparedException = null;
         $this->buffer = '';
         $this->messageValidator = new ValidateOpCode();
         $this->messageValidator
@@ -32,7 +28,10 @@ final class MessageOrchestrator
             ->setNext(new CanIncludeFrame());
     }
 
-    public function onData(MessageBus $messageBus, Message $message): Message|null
+    /**
+     * Orchestrates message so they can be managed, validated and directed.
+     */
+    public function conduct(MessageBus $messageBus, Message $message): OrchestrationResponse
     {
         $this->addBuffer($messageBus->getData());
         $exception = null;
@@ -67,52 +66,30 @@ final class MessageOrchestrator
             $exception = $result->error;
         }
 
-        $this->preparedException = $exception;
-
         $this->clearBuffer();
 
-        return $message;
+        return new OrchestrationResponse(successfullMessage: $message, failedResponse: $exception);
     }
 
-    public function failed(): bool
-    {
-        return !is_null($this->preparedException);
-    }
-
-    public function getCloseType(): CloseFrameEnum
-    {
-        return match (get_class($this->preparedException)) {
-            IncoherentDataException::class => CloseFrameEnum::CLOSE_INCOHERENT_DATA,
-            ProtocolErrorException::class => CloseFrameEnum::CLOSE_PROTOCOL_ERROR,
-            LimitationException::class => CloseFrameEnum::CLOSE_TOO_BIG_TO_PROCESS,
-            default => CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION,
-        };
-    }
-
-    public function addBuffer($data)
+    private function addBuffer($data)
     {
         $this->buffer .= $data;
     }
 
-    public function clearBuffer()
+    private function clearBuffer()
     {
         $this->buffer = '';
     }
 
-    public function getBuffer(): string
+    private function getBuffer(): string
     {
         return $this->buffer;
     }
 
-    public function removeFromBuffer(string $rawData): string
+    private function removeFromBuffer(string $rawData): string
     {
         $this->buffer = removeStart($this->buffer, $rawData);
 
         return $this->buffer;
-    }
-
-    public function getError(): \Exception
-    {
-        return $this->preparedException;
     }
 }

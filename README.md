@@ -1,0 +1,1 @@
+https://www.openmymind.net/WebSocket-Framing-Masking-Fragmentation-and-More/

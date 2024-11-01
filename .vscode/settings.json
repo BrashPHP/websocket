@@ -1,5 +1,4 @@
 {
-    "editor.fontFamily": "Fira Code Retina",
     "php.suggest.basic": false,
     "php.version": "8.3"
 }

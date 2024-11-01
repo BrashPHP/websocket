@@ -1,21 +1,13 @@
 <?php
-/**
- * This file is a part of the Woketo package.
- *
- * (c) Nekland <dev@nekland.fr>
- *
- * For the full license, refer to the LICENSE file in the root directory of this project.
- */
 
 declare(strict_types=1);
 
 namespace Kit\Websocket\Frame;
 
-
 use Kit\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-
 use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
+
 use function Kit\Websocket\functions\frameSize;
 use function Kit\Websocket\functions\intToBinaryString;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kit\Websocket\Utilities;
 
 use function sha1;
@@ -14,7 +16,6 @@ final class KeyDigest
         $socketMagicString = self::WEBSOCKET_MAGIC_STRING_KEY;
         $hash = sha1("{$id}{$socketMagicString}", true);
         
-
         return base64_encode($hash);
     }
 }
