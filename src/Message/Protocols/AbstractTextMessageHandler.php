@@ -14,11 +14,9 @@ abstract class AbstractTextMessageHandler implements MessageHandlerInterface
 
     abstract public function handleTextData(string $data, Connection $connection): void;
 
-    public function handle(string $data, Connection $connection): Promise
+    public function handle(string $data, Connection $connection): void
     {
-        return new Promise(fn($resolve) => $resolve(
-            $this->handleTextData($data, $connection)
-        ));
+        $this->handleTextData($data, $connection);
     }
 }
 

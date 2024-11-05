@@ -14,8 +14,8 @@ class Server
 
     public function __construct(
         private LoopInterface $loopInterface,
-        
     ) {
+        
     }
 
     public function run(SocketServer $socketServer)

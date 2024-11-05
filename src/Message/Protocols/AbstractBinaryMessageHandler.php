@@ -16,11 +16,9 @@ abstract class AbstractBinaryMessageHandler implements MessageHandlerInterface
 
     abstract public function handleBinaryData(string $data, Connection $connection): void;
 
-    public function handle(string $data, Connection $connection): Promise
+    public function handle(string $data, Connection $connection): void
     {
-        return new Promise(fn($resolve) => $resolve(
-            $this->handleBinaryData($data, $connection)
-        ));
+        $this->handleBinaryData($data, $connection);
     }
 }
 

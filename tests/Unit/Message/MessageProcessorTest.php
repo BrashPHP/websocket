@@ -10,10 +10,32 @@ use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Frame\Handlers\PingFrameHandler;
 use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
 use Kit\Websocket\Message\Message;
+use Kit\Websocket\Message\MessageFactory;
 use Kit\Websocket\Message\MessageProcessor;
+use Kit\Websocket\Message\MessageWriter;
+use Mockery\MockInterface;
 use React\Socket\ConnectionInterface;
-
 use function Kit\Websocket\functions\hexArrayToString;
+
+function createMessageWriter(
+    ?FrameFactory $frameFactory = null,
+    ?ConnectionInterface $connectionInterface = null,
+    bool $writeMasked = false,
+): MessageWriter {
+    /** @var ConnectionInterface|\Mockery\MockInterface */
+    $mockServer = mock(ConnectionInterface::class);
+    return new MessageWriter(
+        frameFactory: $frameFactory ?? new FrameFactory(),
+        socket: $connectionInterface ?? $mockServer,
+        writeMasked: $writeMasked,
+    );
+}
+
+function createMockConnection(): MockInterface|ConnectionInterface
+{
+    /** @var ConnectionInterface|\Mockery\MockInterface */
+    return mock(ConnectionInterface::class);
+}
 
 function createSut(): MessageProcessor
 {
@@ -21,8 +43,10 @@ function createSut(): MessageProcessor
     $mockServer = mock(ConnectionInterface::class);
     $mockServer->shouldReceive('write')->withAnyArgs();
     $mockServer->shouldReceive('end')->withAnyArgs();
+    $messageWriter = createMessageWriter(connectionInterface: $mockServer);
+    $messageFactory = new MessageFactory(maxMessagesBuffering: null);
 
-    return new MessageProcessor(new FrameFactory(), $mockServer);
+    return new MessageProcessor($messageWriter, $messageFactory);
 }
 
 test('should build many messages with only one frame data', function (): void {
@@ -130,9 +154,9 @@ test('Should handle special messages with handler', function (): void {
             return $message->getFirstFrame()->getOpcode() === FrameTypeEnum::Close;
         }
 
-        public function process(Message $message, MessageProcessor $messageProcessor, ConnectionInterface $socket): void
+        public function process(Message $message, MessageWriter $messageWriter): void
         {
-            $messageProcessor->write((new FrameFactory())->createCloseFrame());
+            $messageWriter->close();
         }
     };
     expect($processor->addHandler($anonymousHandler))->toEqual($processor);
@@ -146,23 +170,21 @@ test('Should handle special messages with handler', function (): void {
 
 
 test('Should assure that writes frames', function (): void {
-    /** @var ConnectionInterface|\Mockery\MockInterface */
-    $mockServer = mock(ConnectionInterface::class);
+    $mockServer = createMockConnection();
     $expectedString = hexArrayToString(['81', '05', '48', '65', '6c', '6c', '6f']);
     $mockServer->expects('write')->with($expectedString);
     $mockServer->shouldReceive('end')->withAnyArgs();
 
-    $processor = new MessageProcessor(new FrameFactory(), $mockServer);
-
-    $processor->write('Hello');
+    $writer = createMessageWriter(connectionInterface: $mockServer);
+    $writer->writeTextFrame('Hello');
 });
 
 test('Should achieve a limitation exception due to large message', function (): void {
-    /** @var ConnectionInterface|\Mockery\MockInterface */
-    $mockServer = mock(ConnectionInterface::class);
-    $frameFactory = new FrameFactory();
-    $processor = new MessageProcessor($frameFactory, $mockServer, maxMessagesBuffering: 2);
-    $closeFrame = $frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_TOO_BIG_TO_PROCESS);
+    $mockServer = createMockConnection();
+    $factory = new FrameFactory();
+    $messageWriter = createMessageWriter(connectionInterface: $mockServer);
+    $processor = new MessageProcessor($messageWriter, new MessageFactory(maxMessagesBuffering: 2));
+    $closeFrame = $factory->createCloseFrame(CloseFrameEnum::CLOSE_TOO_BIG_TO_PROCESS);
     $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
     $mockServer->shouldReceive('end')->withAnyArgs();
     $longMessageFrame = hexArrayToString(
@@ -302,10 +324,11 @@ test('Should should process ping between two text frames', function (): void {
 });
 
 test('Should catch wrong continuation frame exception', function (): void {
-    /** @var ConnectionInterface|\Mockery\MockInterface */
-    $mockServer = mock(ConnectionInterface::class);
+    $mockServer = createMockConnection();
     $frameFactory = new FrameFactory();
-    $processor = new MessageProcessor($frameFactory, $mockServer);
+    $processor = new MessageProcessor(createMessageWriter(
+        connectionInterface: $mockServer,
+    ), messageFactory: new MessageFactory(null));
     $closeFrame = $frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
     $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
     $mockServer->shouldReceive('end')->withAnyArgs();
@@ -356,11 +379,12 @@ test(
             '69',
             '80' // second frame
         ]);
-
-        /** @var ConnectionInterface|\Mockery\MockInterface */
         $mockServer = mock(ConnectionInterface::class);
         $frameFactory = new FrameFactory();
-        $processor = new MessageProcessor($frameFactory, $mockServer, maxMessagesBuffering: 2);
+        $processor = new MessageProcessor(
+            messageWriter: createMessageWriter($frameFactory, $mockServer),
+            messageFactory: new MessageFactory(maxMessagesBuffering: 2)
+        );
         $closeFrame = $frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
         $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
         $mockServer->shouldReceive('end')->withAnyArgs();

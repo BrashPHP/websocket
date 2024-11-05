@@ -3,49 +3,58 @@
 namespace Kit\Websocket\Handlers;
 
 
-use Kit\Websocket\Events\OnUpgradeEvent;
+use Kit\Websocket\Connection\Connection;
+use Kit\Websocket\Connection\TimeoutHandler;
 use Kit\Websocket\Events\Protocols\Event;
-use Kit\Websocket\Events\Protocols\ListenerInterface;
-use Kit\Websocket\Utilities\HandshakeResponder;
-use Kit\Websocket\Utilities\KeyDigest;
-use React\Socket\ConnectionInterface;
-use React\Stream\WritableResourceStream;
+use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
 
-use function Kit\Websocket\functions\println;
+use Kit\Websocket\Message\MessageProcessor;
+use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use Kit\Websocket\Events\OnDataReceivedEvent;
+
 /**
- * @template-implements ListenerInterface<OnUpgradeEvent>
+ * @template-implements PromiseListenerInterface<OnDataReceivedEvent,Connection>
  */
-final class OnDataReceivedHandler implements ListenerInterface
+final class OnDataReceivedHandler implements PromiseListenerInterface
 {
-    private bool $isFirstChunk = false;
-    private string $firstChunk = '';
-
-    public function __construct(private ConnectionInterface $connectionInterface)
-    {
+    public function __construct(
+        private TimeoutHandler $timeoutHandler,
+        private MessageProcessor $messageProcessor,
+        private MessageHandlerInterface $messageHandlerInterface
+    ) {
     }
-
 
     /**
      * Summary of execute
-     * @param \Kit\Websocket\Events\OnDataReceivedEvent $subject
+     * @param OnDataReceivedEvent $subject
      *
-     * @return void
+     * @return PromiseInterface<Connection>
      */
-    public function execute(Event $subject): void
+    public function execute(Event $subject): PromiseInterface
     {
-        $readableStream = $subject->readableStreamInterface;
-        $readableStream->on('data', $this->handleMessage(...));
-        $readableStream->on('end', $this->reset(...));
-    }
+        $data = $subject->data;
+        $conn = $subject->connection;
+        $currentMessage = null;
+        $notifyTimeout = new Deferred();
+        $this->timeoutHandler->handleConnectionTimeout($notifyTimeout->promise());
 
-    private function handleMessage(string $chunk): void
-    {
-        if ($this->isFirstChunk) {
-            
+        foreach ($this->messageProcessor->process(data: $data, unfinishedMessage: $currentMessage) as $message) {
+            $currentMessage = $message;
+            if ($currentMessage->isComplete()) {
+                if ($this->messageHandlerInterface->supportsFrame(opcode: $currentMessage->getOpcode())) {
+                    $content = $currentMessage->getContent();
+                    $this->messageHandlerInterface->handle(data: $content, connection: $conn);
+                }
+                $currentMessage = null;
+
+                continue;
+            }
+            // Wait for more date before a timeout
+            $notifyTimeout->resolve($conn);
         }
-    }
 
-    private function reset(){
-        $this->isFirstChunk = false;
+        return $notifyTimeout->promise();
     }
 }

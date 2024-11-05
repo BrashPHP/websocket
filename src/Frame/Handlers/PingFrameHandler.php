@@ -7,8 +7,7 @@ namespace Kit\Websocket\Frame\Handlers;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
 use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageProcessor;
-use React\Socket\ConnectionInterface;
+use Kit\Websocket\Message\MessageWriter;
 
 class PingFrameHandler implements FrameHandlerInterface
 {
@@ -25,9 +24,9 @@ class PingFrameHandler implements FrameHandlerInterface
      */
     public function process(
         Message $message,
-        MessageProcessor $messageProcessor,
-        ConnectionInterface $socket
+        MessageWriter $messageWriter
     ): void {
-        $messageProcessor->write($messageProcessor->getFrameFactory()->createPongFrame($message->getContent()));
+        $pong = $messageWriter->getFrameFactory()->createPongFrame($message->getContent());
+        $messageWriter->writeTextFrame($pong);
     }
 }

@@ -2,13 +2,16 @@
 
 namespace Kit\Websocket\Handlers;
 
+use Kit\Websocket\Events\OnUpgradeEvent;
+use Kit\Websocket\Events\Protocols\Event;
+use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
 use Kit\Websocket\Http\RequestVerifier;
 use Kit\Websocket\Utilities\HandshakeResponder;
 use Kit\Websocket\Utilities\KeyDigest;
-use Psr\Http\Message\RequestInterface;
 use React\Promise\Promise;
+use React\Promise\PromiseInterface;
 
-final class OnUpgradeHandler
+final class OnUpgradeHandler implements PromiseListenerInterface
 {
     private RequestVerifier $requestVerifier;
     private HandshakeResponder $handshakeResponder;
@@ -21,8 +24,14 @@ final class OnUpgradeHandler
         $this->keyDigest = new KeyDigest();
     }
 
-    public function execute(RequestInterface $request): Promise
+    /**
+     * @param \Kit\Websocket\Events\OnUpgradeEvent $event
+     *
+     * @return \React\Promise\PromiseInterface
+     */
+    public function execute(Event $event): PromiseInterface
     {
+        $request = $event->request;
         return new Promise(
             resolver: function (callable $resolve, callable $reject) use ($request) {
                 $result = $this->requestVerifier->verify($request);

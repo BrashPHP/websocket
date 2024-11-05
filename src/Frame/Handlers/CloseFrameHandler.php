@@ -9,8 +9,7 @@ use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
 use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageProcessor;
-use React\Socket\ConnectionInterface;
+use Kit\Websocket\Message\MessageWriter;
 use function Kit\Websocket\functions\frameSize;
 
 class CloseFrameHandler implements FrameHandlerInterface
@@ -26,12 +25,11 @@ class CloseFrameHandler implements FrameHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function process(Message $message, MessageProcessor $messageProcessor, ConnectionInterface $socket): void
+    public function process(Message $message, MessageWriter $messageWriter): void
     {
         $frame = $message->getFirstFrame();
         $code = $this->getCloseType($frame);
-        $messageProcessor->write($messageProcessor->getFrameFactory()->createCloseFrame($code));
-        $socket->end();
+        $messageWriter->close($code);
     }
 
     private function getCloseType(Frame $frame): CloseFrameEnum

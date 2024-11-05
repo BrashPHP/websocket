@@ -25,7 +25,7 @@ class ListenerProvider implements ListenerProviderInterface
         return [];
     }
 
-    public function addListener(string $eventType, ListenerInterface|callable $callable): self
+    public function addListener(string $eventType, PromiseListenerInterface|ListenerInterface|callable $callable): self
     {
         $this->listeners[$eventType][] = $callable;
         return $this;

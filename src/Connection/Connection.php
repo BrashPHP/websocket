@@ -5,39 +5,48 @@ declare(strict_types=1);
 namespace Kit\Websocket\Connection;
 
 use Kit\Websocket\Connection\Exceptions\FailedWriteException;
+use Kit\Websocket\Events\OnDataReceivedEvent;
+use Kit\Websocket\Events\OnDisconnectEvent;
+use Kit\Websocket\Events\OnNewConnectionOpenEvent;
+use Kit\Websocket\Events\OnUpgradeEvent;
+use Kit\Websocket\Events\OnWebSocketExceptionEvent;
 use Kit\Websocket\Exceptions\WebSocketException;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Handlers\OnUpgradeHandler;
 use Kit\Websocket\Http\RequestFactory;
-use Kit\Websocket\Message\MessageProcessor;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
-use Psr\Http\Message\UriInterface;
+use Kit\Websocket\Message\MessageWriter;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use React\Promise\Deferred;
-use React\Promise\Promise;
-use React\Socket\ConnectionInterface;
+
 
 class Connection
 {
     const int DEFAULT_TIMEOUT = 5; // in seconds
-
-    protected UriInterface $uri;
+    private bool $handshakeDone = false;
 
     public function __construct(
-        private MessageHandlerInterface $messageHandlerInterface,
-        private MessageProcessor $messageProcessor,
-        private ConnectionInterface $socketStream,
-        private TimeoutHandler $timeoutHandler,
-        private ?LoggerInterface $logger = new NullLogger(),
-        private bool $handshakeDone = false,
+        private EventDispatcherInterface $eventDispatcher,
+        private MessageWriter $messageWriter,
+        private string $ip,
+        private LoggerInterface $logger = new NullLogger(),
     ) {
-        $this->timeoutHandler->setTimeoutAction(function (): void {
-            $this->logger->notice('Connection to ' . $this->getIp() . ' timed out.');
-            $this->messageProcessor->timeout();
-        });
+    }
+
+    public function getIp(): string
+    {
+        return $this->ip;
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    public function getSocketWriter(): MessageWriter{
+        return $this->messageWriter;
     }
 
     public function onMessage(string $data): void
@@ -54,84 +63,66 @@ class Connection
             return;
         }
 
-        $this->messageHandlerInterface->onDisconnect(connection: $this)->then(function (): void {
-            $this->logger->info(message: "Client disconnected");
-        });
-    }
+        $this->eventDispatcher->dispatch(new OnDisconnectEvent($this));
 
-    public function getIp(): string
-    {
-        return $this->socketStream->getRemoteAddress();
+        $this->logger->info(message: "Client disconnected");
     }
 
     public function close(CloseFrameEnum $closeType, ?string $reason = null)
     {
-        $this->messageProcessor->close($closeType, $reason);
+        $this->messageWriter->close($closeType, $reason);
     }
 
-    public function write(string|Frame $frame, FrameTypeEnum $frameTypeEnum): Promise
+    public function write(string|Frame $frame, FrameTypeEnum $frameTypeEnum): void
     {
-        $promise = new Promise(fn() => $this->messageProcessor->write(frame: $frame, opCode: $frameTypeEnum));
-        $promise->catch(function (\Exception $ex): never {
-            if ($ex instanceof WebSocketException) {
-                throw new FailedWriteException($ex);
+        try {
+            $this->messageWriter->writeFrame(frame: $frame, opCode: $frameTypeEnum);
+        } catch (\Throwable $th) {
+            if ($th instanceof WebSocketException) {
+                throw new FailedWriteException($th);
             }
 
-            throw $ex;
-        });
-
-        return $promise;
+            throw $th;
+        }
     }
 
-    public function onError($error)
+    public function onError($data)
     {
-        $this->error($error);
+        $message = "A connectivity error occurred: $data";
+        $this->logger->error($message);
+        $this->eventDispatcher->dispatch(new OnWebSocketExceptionEvent(
+            new WebSocketException($message),
+            $this
+        ));
     }
 
     protected function handshake(string $data): void
     {
+
         $request = RequestFactory::createRequest($data);
         $onUpgradeHandler = new OnUpgradeHandler();
-        $onUpgradeHandler->execute($request)
+        $onUpgradeHandler->execute(new OnUpgradeEvent($request))
             ->then(onFulfilled: function (string $handshakeResponse): void {
-                $this->socketStream->write($handshakeResponse);
+                $this->messageWriter->write($handshakeResponse);
                 $this->handshakeDone = true;
-                $this->messageHandlerInterface->onOpen($this);
+                $this->eventDispatcher->dispatch(new OnNewConnectionOpenEvent($this));
             })
             ->catch(onRejected: function (WebSocketException $webSocketException): void {
-                $this->messageProcessor->close(CloseFrameEnum::CLOSE_NORMAL);
-                $this->logger->notice('Connection to ' . $this->getIp() . ' closed with error : ' . $webSocketException->getMessage());
-                $this->messageHandlerInterface->onError($webSocketException, $this);
+                $this->messageWriter->close(CloseFrameEnum::CLOSE_NORMAL);
+                $this->logger->notice('Connection to ' . $this->ip . ' closed with error : ' . $webSocketException->getMessage());
+                $this->eventDispatcher->dispatch(new OnWebSocketExceptionEvent($webSocketException, $this));
             });
     }
 
     protected function processMessage(string $data): void
     {
-        $currentMessage = null;
-        $notifyTimeout = new Deferred();
-        $this->timeoutHandler->handleConnectionTimeout($notifyTimeout->promise());
-        
-        foreach ($this->messageProcessor->process(data: $data, unfinishedMessage: $currentMessage) as $message) {
-            $currentMessage = $message;
-            if ($currentMessage->isComplete()) {
-                if ($this->messageHandlerInterface->supportsFrame(opcode: $currentMessage->getOpcode())) {
-                    $data = $currentMessage->getContent();
-                    $this->messageHandlerInterface->handle(data: $data, connection: $this);
-                }
-                $currentMessage = null;
-
-                continue;
-            }
-            // We wait for more data so we start a timeout.
-            $notifyTimeout->resolve(true);
-        }
+        $this->eventDispatcher->dispatch(new OnDataReceivedEvent($data, $this));
     }
 
-    protected function error($data)
+    public function timeout()
     {
-        $message = "A connectivity error occurred: $data";
-        $this->logger->error($message);
-        $this->messageHandlerInterface->onError(e: new WebSocketException($message), connection: $this);
+        $this->logger->notice("Connection to {$this->ip} timed out.");
+        $this->messageWriter->close(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
     }
 }
 

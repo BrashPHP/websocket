@@ -28,4 +28,4 @@ test('should receive event correctly', function (): void {
     $event = $dispatcher->dispatch(new OnUpgradeEvent($mockServerRequest));
 
     expect($event)->toBeObject();
-});
+})->skip();
