@@ -15,8 +15,8 @@ class TimeoutHandler
     private ?TimerInterface $timer = null;
 
     public function __construct(
-        private LoopInterface $loop,
-        private int $timeoutSeconds
+        private readonly LoopInterface $loop,
+        private readonly int $timeoutSeconds
     ) {
     }
 

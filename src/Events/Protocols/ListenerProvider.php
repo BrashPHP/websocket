@@ -15,9 +15,10 @@ class ListenerProvider implements ListenerProviderInterface
      *   An iterable (array, iterator, or generator) of callables.  Each
      *   callable MUST be type-compatible with $event.
      */
+    #[\Override]
     public function getListenersForEvent(object $event): iterable
     {
-        $eventType = get_class($event);
+        $eventType = $event::class;
         if (array_key_exists($eventType, $this->listeners)) {
             return $this->listeners[$eventType];
         }

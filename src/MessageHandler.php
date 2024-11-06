@@ -6,7 +6,7 @@ namespace Kit\Websocket;
 
 class MessageHandler
 {
-    private \Fiber $fiber;
+    private readonly \Fiber $fiber;
     private bool $isRunning = false;
 
     public function __construct()

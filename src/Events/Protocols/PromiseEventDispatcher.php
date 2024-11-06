@@ -11,10 +11,11 @@ use function React\Promise\resolve;
 class PromiseEventDispatcher implements EventDispatcherInterface
 {
 
-    public function __construct(private ListenerProviderInterface $listenerProvider)
+    public function __construct(private readonly ListenerProviderInterface $listenerProvider)
     {
     }
 
+    #[\Override]
     public function dispatch(object $event): PromiseInterface
     {
 

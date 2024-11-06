@@ -14,9 +14,9 @@ use function Kit\Websocket\functions\intToBinaryString;
 class Frame
 {
     public function __construct(
-        private FrameTypeEnum $opcode,
-        private FrameMetadata $metadata,
-        private FramePayload $framePayload,
+        private readonly FrameTypeEnum $opcode,
+        private readonly FrameMetadata $metadata,
+        private readonly FramePayload $framePayload,
     ) {
     }
 

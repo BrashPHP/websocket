@@ -10,6 +10,7 @@ use Kit\Websocket\Frame\Protocols\FrameOpcodeValidatorInterface;
 
 final class CloseFrameValidation implements FrameOpcodeValidatorInterface
 {
+    #[\Override]
     public function validate(Frame $frame): ?ProtocolErrorException
     {
         if($frame->getFramePayload()->getPayloadLength() === 1) {

@@ -9,10 +9,11 @@ use Psr\EventDispatcher\StoppableEventInterface;
 class EventDispatcher implements EventDispatcherInterface
 {
 
-    public function __construct(private ListenerProviderInterface $listenerProvider)
+    public function __construct(private readonly ListenerProviderInterface $listenerProvider)
     {
     }
 
+    #[\Override]
     public function dispatch(object $event): object
     {
 

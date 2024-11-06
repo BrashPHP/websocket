@@ -14,6 +14,7 @@ final class ControlFrameValidation implements FrameOpcodeValidatorInterface
 {
     public const int MAX_CONTROL_FRAME_SIZE = 125;
 
+    #[\Override]
     public function validate(Frame $frame): ?ProtocolErrorException{
         if ($frame->isControlFrame()) {
             if (!$frame->isFinal()) {

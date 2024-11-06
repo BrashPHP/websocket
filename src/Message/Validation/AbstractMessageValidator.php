@@ -10,6 +10,7 @@ abstract class AbstractMessageValidator implements ValidationChainInterface
 
     protected ?ValidationChainInterface $nextHandler = null;
 
+    #[\Override]
     public function validate(Message $message, Frame $frame): ValidationResult
     {
         return $this->nextHandler?->validate($message, $frame) ?? new ValidationResult(
@@ -17,6 +18,7 @@ abstract class AbstractMessageValidator implements ValidationChainInterface
         );
     }
 
+    #[\Override]
     public function setNext(ValidationChainInterface $next): ValidationChainInterface
     {
         $this->nextHandler = $next;

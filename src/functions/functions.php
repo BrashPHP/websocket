@@ -27,9 +27,9 @@ if (!function_exists('removeStart')) {
 if (!function_exists('startsWith')) {
     function startsWith($str, $start)
     {
-        $length = strlen($start);
+        $length = strlen((string) $start);
 
-        return substr($str, 0, $length) === $start;
+        return substr((string) $str, 0, $length) === $start;
     }
 
 }

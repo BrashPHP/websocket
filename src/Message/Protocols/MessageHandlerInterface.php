@@ -6,9 +6,10 @@ namespace Kit\Websocket\Message\Protocols;
 
 use Kit\Websocket\Connection\Connection;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
+use Kit\Websocket\Message\Message;
 
 interface MessageHandlerInterface
 {
-    public function handle(string $data, Connection $connection): void;
-    public function supportsFrame(FrameTypeEnum $opcode): bool;
+    public function handle(Message $message, Connection $connection): void;
+    public function hasSupport(Message $message): bool;
 }

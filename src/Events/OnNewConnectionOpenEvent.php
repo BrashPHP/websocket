@@ -7,7 +7,7 @@ namespace Kit\Websocket\Events;
 use Kit\Websocket\Connection\Connection;
 use Kit\Websocket\Events\Protocols\Event;
 
-readonly class OnNewConnectionOpenEvent extends Event
+class OnNewConnectionOpenEvent extends Event
 {
     public function __construct(public Connection $connection)
     {

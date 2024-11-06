@@ -8,7 +8,7 @@ use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Frame\FrameFactory;
 use React\Socket\ConnectionInterface;
 
-final class MessageWriter
+class MessageWriter
 {
     public function __construct(
         private FrameFactory $frameFactory,

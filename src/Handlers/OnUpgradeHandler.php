@@ -11,7 +11,7 @@ use Kit\Websocket\Utilities\KeyDigest;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
-final class OnUpgradeHandler implements PromiseListenerInterface
+final readonly class OnUpgradeHandler implements PromiseListenerInterface
 {
     private RequestVerifier $requestVerifier;
     private HandshakeResponder $handshakeResponder;
@@ -29,6 +29,7 @@ final class OnUpgradeHandler implements PromiseListenerInterface
      *
      * @return \React\Promise\PromiseInterface
      */
+    #[\Override]
     public function execute(Event $event): PromiseInterface
     {
         $request = $event->request;

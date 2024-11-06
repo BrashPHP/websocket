@@ -4,21 +4,22 @@ namespace Kit\Websocket\Message\Protocols;
 
 use Kit\Websocket\Connection\Connection;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use React\Promise\Deferred;
-use React\Promise\Promise;
+use Kit\Websocket\Message\Message;
 
 abstract class AbstractBinaryMessageHandler implements MessageHandlerInterface
 {
-    public function supportsFrame(FrameTypeEnum $opcode): bool
+    #[\Override]
+    public function hasSupport(Message $message): bool
     {
-        return $opcode === FrameTypeEnum::Binary;
+        return $message->getOpcode() === FrameTypeEnum::Binary;
     }
 
     abstract public function handleBinaryData(string $data, Connection $connection): void;
 
-    public function handle(string $data, Connection $connection): void
+    #[\Override]
+    public function handle(Message $message, Connection $connection): void
     {
-        $this->handleBinaryData($data, $connection);
+        $this->handleBinaryData($message->getContent(), $connection);
     }
 }
 

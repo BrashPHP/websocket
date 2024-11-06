@@ -26,7 +26,7 @@ $socket->on('connection', function (React\Socket\ConnectionInterface $connection
         }
 
         // prefix with client IP and broadcast to all connected clients
-        $data = trim(parse_url($connection->getRemoteAddress(), PHP_URL_HOST), '[]') . ': ' . $data . PHP_EOL;
+        $data = trim(parse_url((string) $connection->getRemoteAddress(), PHP_URL_HOST), '[]') . ': ' . $data . PHP_EOL;
         foreach ($socket->getConnections() as $connection) {
             $connection->write(strtoupper($data));
         }

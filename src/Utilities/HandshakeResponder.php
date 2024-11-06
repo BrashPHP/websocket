@@ -9,7 +9,7 @@ final class HandshakeResponder
         $lineSeparator = '\r\n';
 
         return implode(
-            array_map(callback: fn($line): string => sprintf("%s%s", $line, $lineSeparator), array: [
+            '', array_map(callback: fn($line): string => sprintf("%s%s", $line, $lineSeparator), array: [
                 'HTTP/1.1 101 Switching Protocols',
                 'Upgrade: websocket',
                 'Connection: Upgrade',

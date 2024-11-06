@@ -26,8 +26,8 @@ use function Kit\Websocket\functions\intToBinaryString;
  */
 class FrameFactory
 {
-    private FrameBuilder $frameBuilder;
-    private PayloadLengthCalculator $payloadLengthCalculator;
+    private readonly FrameBuilder $frameBuilder;
+    private readonly PayloadLengthCalculator $payloadLengthCalculator;
 
     /**
      * (0.5MiB) Adjust if needed.
@@ -35,7 +35,7 @@ class FrameFactory
     public const int MAX_PAYLOAD_SIZE = 524288;
 
 
-    public function __construct(private int $maxPayloadSize = 524288)
+    public function __construct(private readonly int $maxPayloadSize = 524288)
     {
         $this->frameBuilder = new FrameBuilder();
         $this->payloadLengthCalculator = new PayloadLengthCalculator();

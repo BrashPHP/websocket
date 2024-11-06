@@ -10,6 +10,7 @@ use Kit\Websocket\Message\Message;
 
 final class ValidateOpCode extends AbstractMessageValidator
 {
+    #[\Override]
     public function validate(Message $message, Frame $frame): ValidationResult
     {
         $validation = new ValidationUponOpCode();

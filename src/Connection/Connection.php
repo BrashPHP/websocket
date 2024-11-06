@@ -14,7 +14,6 @@ use Kit\Websocket\Exceptions\WebSocketException;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Handlers\OnUpgradeHandler;
 use Kit\Websocket\Http\RequestFactory;
 use Kit\Websocket\Message\MessageWriter;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -28,11 +27,16 @@ class Connection
     private bool $handshakeDone = false;
 
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
-        private MessageWriter $messageWriter,
-        private string $ip,
-        private LoggerInterface $logger = new NullLogger(),
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly MessageWriter $messageWriter,
+        private readonly string $ip,
+        private readonly LoggerInterface $logger = new NullLogger(),
     ) {
+    }
+
+    public function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
     }
 
     public function getIp(): string
@@ -45,7 +49,8 @@ class Connection
         return $this->logger;
     }
 
-    public function getSocketWriter(): MessageWriter{
+    public function getSocketWriter(): MessageWriter
+    {
         return $this->messageWriter;
     }
 
@@ -100,9 +105,9 @@ class Connection
     {
 
         $request = RequestFactory::createRequest($data);
-        $onUpgradeHandler = new OnUpgradeHandler();
-        $onUpgradeHandler->execute(new OnUpgradeEvent($request))
-            ->then(onFulfilled: function (string $handshakeResponse): void {
+        $this->eventDispatcher->dispatch(new OnUpgradeEvent(
+            $request
+        ))->then(onFulfilled: function (string $handshakeResponse): void {
                 $this->messageWriter->write($handshakeResponse);
                 $this->handshakeDone = true;
                 $this->eventDispatcher->dispatch(new OnNewConnectionOpenEvent($this));
@@ -123,6 +128,10 @@ class Connection
     {
         $this->logger->notice("Connection to {$this->ip} timed out.");
         $this->messageWriter->close(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
+    }
+
+    public function isHandshakeDone(){
+        return $this->handshakeDone;
     }
 }
 

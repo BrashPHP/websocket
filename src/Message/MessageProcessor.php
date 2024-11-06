@@ -14,11 +14,11 @@ class MessageProcessor
 {
     /** @var FrameHandlerInterface[] */
     private array $handlers;
-    private MessageOrchestrator $messageOrchestrator;
+    private readonly MessageOrchestrator $messageOrchestrator;
 
     public function __construct(
-        private MessageWriter $messageWriter,
-        private MessageFactory $messageFactory
+        private readonly MessageWriter $messageWriter,
+        private readonly MessageFactory $messageFactory
     ) {
         $this->messageOrchestrator = new MessageOrchestrator($messageWriter->getFrameFactory());
         $this->handlers = [];
@@ -60,8 +60,6 @@ class MessageProcessor
                 $message = $response->successfullMessage;
 
                 if ($message->isComplete()) {
-                    $this->processHelper($message);
-
                     yield $message;
 
                     $message = null;
@@ -69,7 +67,7 @@ class MessageProcessor
                     yield $message;
                 }
 
-            } catch (\Throwable $th) {
+            } catch (\Throwable) {
                 $this->messageWriter->writeExceptionCode(CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION);
 
                 $messageBus->setData(null);
@@ -77,19 +75,19 @@ class MessageProcessor
         } while ($messageBus->hasValidData());
     }
 
-    public function addHandler(FrameHandlerInterface $handler): static
-    {
-        $this->handlers[] = $handler;
+    // public function addHandler(FrameHandlerInterface $handler): static
+    // {
+    //     $this->handlers[] = $handler;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    private function processHelper(Message $message): void
-    {
-        foreach ($this->handlers as $handler) {
-            if ($handler->supports(message: $message)) {
-                $handler->process(message: $message, messageWriter: $this->messageWriter);
-            }
-        }
-    }
+    // private function processHelper(Message $message): void
+    // {
+    //     foreach ($this->handlers as $handler) {
+    //         if ($handler->supports(message: $message)) {
+    //             $handler->process(message: $message, messageWriter: $this->messageWriter);
+    //         }
+    //     }
+    // }
 }

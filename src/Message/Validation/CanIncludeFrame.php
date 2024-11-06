@@ -8,6 +8,7 @@ use Kit\Websocket\Message\Message;
 
 final class CanIncludeFrame extends AbstractMessageValidator
 {
+    #[\Override]
     public function validate(Message $message, Frame $frame): ValidationResult
     {
         $exception = $message->addFrame($frame);

@@ -23,7 +23,7 @@ final class Message
      */
     private array $frames;
     private bool $isComplete;
-    private int $maxMessagesBuffering;
+    private readonly int $maxMessagesBuffering;
 
     private bool $isContinuationMessage = false;
 

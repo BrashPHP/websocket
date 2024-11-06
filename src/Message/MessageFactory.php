@@ -4,7 +4,7 @@
 namespace Kit\Websocket\Message;
 
 
-final class MessageFactory
+final readonly class MessageFactory
 {
     public function __construct(private ?int $maxMessagesBuffering = null)
     {

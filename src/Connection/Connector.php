@@ -6,7 +6,7 @@ namespace Kit\Websocket\Connection;
 
 use React\Socket\ConnectionInterface;
 
-final class Connector
+final readonly class Connector
 {
     public function __construct(
         private ConnectionInterface $socketStream,

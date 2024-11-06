@@ -28,7 +28,7 @@ final readonly class OrchestrationResponse
 
     public function getCloseType(): CloseFrameEnum
     {
-        return match (get_class($this->failedResponse)) {
+        return match ($this->failedResponse !== null ? $this->failedResponse::class : self::class) {
             IncoherentDataException::class => CloseFrameEnum::CLOSE_INCOHERENT_DATA,
             ProtocolErrorException::class => CloseFrameEnum::CLOSE_PROTOCOL_ERROR,
             LimitationException::class => CloseFrameEnum::CLOSE_TOO_BIG_TO_PROCESS,

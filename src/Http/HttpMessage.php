@@ -28,6 +28,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * Retrieves the HTTP protocol version as a string.
      * @return string HTTP protocol version.
      */
+    #[\Override]
     public function getProtocolVersion(): string
     {
         return $this->version;
@@ -38,6 +39,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @param string $version HTTP protocol version
      * @return static
      */
+    #[\Override]
     public function withProtocolVersion(string $version): self
     {
         $new = clone $this;
@@ -49,6 +51,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * Retrieves all message header values.
      * @return string[][] Returns an associative array of the message's headers.
      */
+    #[\Override]
     public function getHeaders(): array
     {
         return array_merge(...array_values($this->headers));
@@ -59,6 +62,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @param string $name Case-insensitive header field name.
      * @return bool Returns true if any header names match the given header.
      */
+    #[\Override]
     public function hasHeader(string $name): bool
     {
         return array_key_exists(strtolower($name), $this->headers);
@@ -69,6 +73,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @param string $name Case-insensitive header field name.
      * @return string[] An array of string values as provided for the given header.
      */
+    #[\Override]
     public function getHeader(string $name): array
     {
         $headers = $this->headers[strtolower($name)] ?: [];
@@ -82,6 +87,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @param string $name Case-insensitive header field name.
      * @return string A string of values as provided for the given header.
      */
+    #[\Override]
     public function getHeaderLine(string $name): string
     {
         return implode(',', $this->getHeader($name));
@@ -94,6 +100,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @return static
      * @throws \InvalidArgumentException for invalid header names or values.
      */
+    #[\Override]
     public function withHeader(string $name, mixed $value): self
     {
         $new = clone $this;
@@ -112,6 +119,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @throws \InvalidArgumentException for invalid header names.
      * @throws \InvalidArgumentException for invalid header values.
      */
+    #[\Override]
     public function withAddedHeader(string $name, mixed $value): self
     {
         $new = clone $this;
@@ -124,6 +132,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @param string $name Case-insensitive header field name to remove.
      * @return static
      */
+    #[\Override]
     public function withoutHeader(string $name): self
     {
         $new = clone $this;
@@ -136,6 +145,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
     /**
      * Not implemented, WebSocket only use headers.
      */
+    #[\Override]
     public function getBody(): StreamInterface
     {
         throw new BadMethodCallException("Not implemented.");
@@ -144,6 +154,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
     /**
      * Not implemented, WebSocket only use headers.
      */
+    #[\Override]
     public function withBody(StreamInterface $body): self
     {
         throw new BadMethodCallException("Not implemented.");
@@ -175,13 +186,14 @@ abstract class HttpMessage implements MessageInterface, Stringable
         }
     }
 
+    #[\Override]
     public function __toString(): string
     {
-        return get_class($this);
+        return static::class;
     }
 
     protected function stringable(string $format, mixed ...$values): string
     {
-        return sprintf("%s({$format})", get_class($this), ...$values);
+        return sprintf("%s({$format})", static::class, ...$values);
     }
 }

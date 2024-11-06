@@ -1,25 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Kit\Websocket\Connection;
 
-use Kit\Websocket\Events\Protocols\Event;
 use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
 use Kit\Websocket\Handlers\OnDataReceivedHandler;
 use Kit\Websocket\Message\MessageFactory;
 use Kit\Websocket\Message\MessageProcessor;
 use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
 use React\EventLoop\LoopInterface;
-use React\Promise\PromiseInterface;
 
-
-final class MessageHandlerAdapter implements PromiseListenerInterface
+final class DataHandlerFactory
 {
     private TimeoutHandler $cachedtimeoutHandler;
+    /**
+     * @var \Kit\Websocket\Message\Protocols\MessageHandlerInterface[]
+     */
+    private array $messageHandlers = [];
 
     public function __construct(
-        private MessageHandlerInterface $messageHandlerInterface,
         private Config $config,
         private LoopInterface $loopInterface
     ) {
@@ -29,20 +27,24 @@ final class MessageHandlerAdapter implements PromiseListenerInterface
         );
     }
 
-    /**
-     * @param \Kit\Websocket\Events\OnDataReceivedEvent $subject
-     *
-     * @return PromiseInterface<Connection>
-     */
-    public function execute(Event $subject): PromiseInterface
+    public function appendMessageHandler(MessageHandlerInterface $messageHandlerInterface){
+        $this->messageHandlers[] = $messageHandlerInterface;
+    }
+
+    public function create(Connection $connection): PromiseListenerInterface
     {
         $handler = new OnDataReceivedHandler(
             timeoutHandler: $this->cachedtimeoutHandler,
-            messageProcessor: $this->createMessageProcessor($subject->connection),
-            messageHandlerInterface: $this->messageHandlerInterface
+            messageProcessor: $this->createMessageProcessor(
+                $connection
+            ),
         );
 
-        return $handler->execute($subject);
+        foreach ($this->messageHandlers as $messageHandler) {
+            $handler->addMessageHandler($messageHandler);
+        }
+
+        return $handler;
     }
 
     private function createMessageProcessor(Connection $connection)
@@ -55,4 +57,5 @@ final class MessageHandlerAdapter implements PromiseListenerInterface
         );
     }
 }
+
 

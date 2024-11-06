@@ -2,34 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\Handlers;
+namespace Kit\Websocket\Message\Handlers;
 
+use Kit\Websocket\Connection\Connection;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
 use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageWriter;
+use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
 use function Kit\Websocket\functions\frameSize;
 
-class CloseFrameHandler implements FrameHandlerInterface
+class CloseFrameHandler implements MessageHandlerInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function supports(Message $message): bool
+    #[\Override]
+    public function hasSupport(Message $message): bool
     {
-        return $message->getFirstFrame()->getOpcode() === FrameTypeEnum::Close;
+        return $message->getOpcode() === FrameTypeEnum::Close;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function process(Message $message, MessageWriter $messageWriter): void
+    #[\Override]
+    public function handle(Message $message, Connection $connection): void
     {
         $frame = $message->getFirstFrame();
         $code = $this->getCloseType($frame);
-        $messageWriter->close($code);
+        $connection->close($code);
     }
 
     private function getCloseType(Frame $frame): CloseFrameEnum

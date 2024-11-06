@@ -11,6 +11,7 @@ use Kit\Websocket\Frame\Protocols\FrameOpcodeValidatorInterface;
 
 final class ValidationUponOpCode implements FrameOpcodeValidatorInterface
 {
+    #[\Override]
     public function validate(Frame $frame): ?ProtocolErrorException
     {
         $validator = null;

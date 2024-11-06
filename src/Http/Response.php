@@ -81,19 +81,15 @@ class Response extends HttpMessage implements ResponseInterface
         511 => 'Network Authentication Required',
     ];
 
-    private int $code;
-    private string $reason;
-
-    public function __construct(int $code = 200, string $reasonPhrase = '')
+    public function __construct(private int $code = 200, private string $reason = '')
     {
-        $this->code = $code;
-        $this->reason = $reasonPhrase;
     }
 
     /**
      * Gets the response status code.
      * @return int Status code.
      */
+    #[\Override]
     public function getStatusCode(): int
     {
         return $this->code;
@@ -106,6 +102,7 @@ class Response extends HttpMessage implements ResponseInterface
      * @return static
      * @throws \InvalidArgumentException For invalid status code arguments.
      */
+    #[\Override]
     public function withStatus(int $code, string $reasonPhrase = ''): self
     {
         $new = clone $this;
@@ -118,17 +115,20 @@ class Response extends HttpMessage implements ResponseInterface
      * Gets the response reason phrase associated with the status code.
      * @return string Reason phrase; must return an empty string if none present.
      */
+    #[\Override]
     public function getReasonPhrase(): string
     {
         $d = self::$codes[$this->code];
         return $this->reason ?: $d;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->stringable('%s', $this->getStatusCode());
     }
 
+    #[\Override]
     public function getAsArray(): array
     {
         return array_merge([

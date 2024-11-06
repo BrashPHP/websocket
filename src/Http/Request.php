@@ -19,13 +19,11 @@ use Psr\Http\Message\{
 class Request extends HttpMessage implements RequestInterface
 {
     private string $target = '';
-    private string $method;
     private Uri $uri;
 
-    public function __construct(string $method = 'GET', UriInterface|string|null $uri = null)
+    public function __construct(private string $method = 'GET', UriInterface|string|null $uri = null)
     {
         $this->uri = $uri instanceof Uri ? $uri : new Uri((string)$uri);
-        $this->method = $method;
         $this->headers = ['host' => ['Host' => [$this->formatHostHeader($this->uri)]]];
     }
 
@@ -33,6 +31,7 @@ class Request extends HttpMessage implements RequestInterface
      * Retrieves the message's request target.
      * @return string
      */
+    #[\Override]
     public function getRequestTarget(): string
     {
         if ($this->target) {
@@ -47,6 +46,7 @@ class Request extends HttpMessage implements RequestInterface
      * @param mixed $requestTarget
      * @return static
      */
+    #[\Override]
     public function withRequestTarget(mixed $requestTarget): self
     {
         $new = clone $this;
@@ -58,6 +58,7 @@ class Request extends HttpMessage implements RequestInterface
      * Retrieves the HTTP method of the request.
      * @return string Returns the request method.
      */
+    #[\Override]
     public function getMethod(): string
     {
         return $this->method;
@@ -69,6 +70,7 @@ class Request extends HttpMessage implements RequestInterface
      * @return static
      * @throws \InvalidArgumentException for invalid HTTP methods.
      */
+    #[\Override]
     public function withMethod(string $method): self
     {
         $new = clone $this;
@@ -81,6 +83,7 @@ class Request extends HttpMessage implements RequestInterface
      * This method MUST return a UriInterface instance.
      * @return UriInterface Returns a UriInterface instance representing the URI of the request.
      */
+    #[\Override]
     public function getUri(): UriInterface
     {
         return $this->uri;
@@ -92,6 +95,7 @@ class Request extends HttpMessage implements RequestInterface
      * @param bool $preserveHost Preserve the original state of the Host header.
      * @return static
      */
+    #[\Override]
     public function withUri(UriInterface $uri, bool $preserveHost = false): self
     {
         $new = clone $this;
@@ -105,11 +109,13 @@ class Request extends HttpMessage implements RequestInterface
         return $new;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->stringable('%s %s', $this->getMethod(), $this->getUri());
     }
 
+    #[\Override]
     public function getAsArray(): array
     {
         return array_merge([

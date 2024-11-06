@@ -25,7 +25,7 @@ if (!function_exists('validateBit')) {
 if (!function_exists('nthBitFromByte')) {
     function nthBitFromByte(int $byte, int $bitNumber): int
     {
-        $realNth = \pow(2, 8 - $bitNumber);
+        $realNth = 2 ** (8 - $bitNumber);
 
         return (int) ($realNth === ($byte & $realNth));
     }

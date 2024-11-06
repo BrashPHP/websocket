@@ -16,10 +16,10 @@ use function Kit\Websocket\functions\removeStart;
 
 final class MessageOrchestrator
 {
-    private AbstractMessageValidator $messageValidator;
+    private readonly AbstractMessageValidator $messageValidator;
     private string $buffer;
 
-    public function __construct(private FrameFactory $frameFactory)
+    public function __construct(private readonly FrameFactory $frameFactory)
     {
         $this->buffer = '';
         $this->messageValidator = new ValidateOpCode();

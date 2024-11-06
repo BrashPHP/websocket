@@ -18,6 +18,7 @@ class Event implements StoppableEventInterface
      *   True if the Event is complete and no further listeners should be called.
      *   False to continue calling listeners.
      */
+    #[\Override]
     public function isPropagationStopped(): bool
     {
         return $this->propagationStopped;

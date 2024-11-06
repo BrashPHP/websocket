@@ -7,8 +7,7 @@ namespace Tests\Unit\Message;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Frame\Handlers\PingFrameHandler;
-use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
+use Kit\Websocket\Message\Handlers\PingFrameHandler;
 use Kit\Websocket\Message\Message;
 use Kit\Websocket\Message\MessageFactory;
 use Kit\Websocket\Message\MessageProcessor;
@@ -16,20 +15,7 @@ use Kit\Websocket\Message\MessageWriter;
 use Mockery\MockInterface;
 use React\Socket\ConnectionInterface;
 use function Kit\Websocket\functions\hexArrayToString;
-
-function createMessageWriter(
-    ?FrameFactory $frameFactory = null,
-    ?ConnectionInterface $connectionInterface = null,
-    bool $writeMasked = false,
-): MessageWriter {
-    /** @var ConnectionInterface|\Mockery\MockInterface */
-    $mockServer = mock(ConnectionInterface::class);
-    return new MessageWriter(
-        frameFactory: $frameFactory ?? new FrameFactory(),
-        socket: $connectionInterface ?? $mockServer,
-        writeMasked: $writeMasked,
-    );
-}
+use function Tests\Helpers\createMessageWriter;
 
 function createMockConnection(): MockInterface|ConnectionInterface
 {
@@ -105,8 +91,6 @@ test('Should receive ContinueFrameEvaluation After Control Frame', function (): 
 
     $processor = createSut();
 
-    $processor->addHandler(new PingFrameHandler());
-
     $messages = iterator_to_array($processor->process($multipleFrameData));
 
     expect($messages)->toHaveCount(3);
@@ -144,30 +128,6 @@ test('Should build only complete messages', function (): void {
     ));
     expect($messages)->toHaveCount(1);
 });
-
-
-test('Should handle special messages with handler', function (): void {
-    $processor = createSut();
-    $anonymousHandler = new class () implements FrameHandlerInterface {
-        public function supports(Message $message): bool
-        {
-            return $message->getFirstFrame()->getOpcode() === FrameTypeEnum::Close;
-        }
-
-        public function process(Message $message, MessageWriter $messageWriter): void
-        {
-            $messageWriter->close();
-        }
-    };
-    expect($processor->addHandler($anonymousHandler))->toEqual($processor);
-
-    $messages = iterator_to_array($processor->process(
-        hexArrayToString(['88', '02', '03', 'E8']),
-    ));
-
-    expect(FrameTypeEnum::Close)->toEqual($messages[0]->getOpcode());
-});
-
 
 test('Should assure that writes frames', function (): void {
     $mockServer = createMockConnection();

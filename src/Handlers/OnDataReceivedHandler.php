@@ -19,19 +19,21 @@ use Kit\Websocket\Events\OnDataReceivedEvent;
  */
 final class OnDataReceivedHandler implements PromiseListenerInterface
 {
+
     public function __construct(
         private TimeoutHandler $timeoutHandler,
         private MessageProcessor $messageProcessor,
-        private MessageHandlerInterface $messageHandlerInterface
+        /** @var MessageHandlerInterface[]*/
+        private array $messageHandlers = []
     ) {
     }
 
     /**
-     * Summary of execute
      * @param OnDataReceivedEvent $subject
      *
      * @return PromiseInterface<Connection>
      */
+    #[\Override]
     public function execute(Event $subject): PromiseInterface
     {
         $data = $subject->data;
@@ -43,10 +45,12 @@ final class OnDataReceivedHandler implements PromiseListenerInterface
         foreach ($this->messageProcessor->process(data: $data, unfinishedMessage: $currentMessage) as $message) {
             $currentMessage = $message;
             if ($currentMessage->isComplete()) {
-                if ($this->messageHandlerInterface->supportsFrame(opcode: $currentMessage->getOpcode())) {
-                    $content = $currentMessage->getContent();
-                    $this->messageHandlerInterface->handle(data: $content, connection: $conn);
+                foreach ($this->messageHandlers as $handler) {
+                    if ($handler->hasSupport($currentMessage)) {
+                        $handler->handle($currentMessage, connection: $conn);
+                    }
                 }
+
                 $currentMessage = null;
 
                 continue;
@@ -56,5 +60,12 @@ final class OnDataReceivedHandler implements PromiseListenerInterface
         }
 
         return $notifyTimeout->promise();
+    }
+
+    public function addMessageHandler(MessageHandlerInterface $messageHandlerInterface): static
+    {
+        array_push($this->messageHandlers, $messageHandlerInterface);
+
+        return $this;
     }
 }

@@ -10,6 +10,7 @@ use Kit\Websocket\Message\Message;
 
 final class ValidateFrame extends AbstractMessageValidator
 {
+    #[\Override]
     public function validate(Message $message, Frame $frame): ValidationResult
     {
         $exception = null;
