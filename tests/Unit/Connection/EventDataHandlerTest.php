@@ -12,7 +12,6 @@ use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
 use function Kit\Websocket\functions\hexArrayToString;
 use function Tests\Helpers\createMessageProcessor;
 use function Tests\Helpers\createTimeoutHandler;
-use function Tests\Helpers\getHandshake;
 use function Tests\Helpers\mockMessage;
 use function Tests\Helpers\readTempZip;
 

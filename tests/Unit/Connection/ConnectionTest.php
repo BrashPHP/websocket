@@ -4,6 +4,7 @@ namespace Tests\Unit\Connection;
 
 use Kit\Websocket\Connection\Connection;
 use Kit\Websocket\Connection\Connector;
+use Kit\Websocket\Events\OnDataReceivedEvent;
 use Kit\Websocket\Events\OnDisconnectEvent;
 use Kit\Websocket\Events\OnNewConnectionOpenEvent;
 use Kit\Websocket\Events\OnUpgradeEvent;
@@ -53,61 +54,19 @@ test('Should receive handshake correctly and dispatch upgrade event', function (
     expect($sut->isHandshakeDone())->toBeTrue();
 });
 
-// test('Should support text message', function (): void {
-//     $helloFrame = hexArrayToString(['81', '05', '48', '65', '6c', '6c', '6f']);
-//     // Mock message properties
-//     $message = mockMessage(FrameTypeEnum::Text, 'Hello');
-//     $messageProcessor = createMessageProcessor();
-//     $messageProcessor->shouldReceive('write')->withAnyArgs();
-//     $messageProcessor->shouldReceive('process')->with($helloFrame, null)->andReturn(generateMessage($message));
-//     $handlerSpy = spy(MessageHandlerInterface::class);
-//     // Expectations
-//     $handlerSpy->shouldReceive('supportsFrame')->withAnyArgs()->once()->andReturn(true);
+test('Should call OnDataReceivedEvent successfully after handshake', function (): void {
+    $dispatcher = mock(EventDispatcherInterface::class);
+    $dispatcher->shouldReceive('dispatch')->with(OnUpgradeEvent::class)->andReturn(resolve('any_handshake_response'));
+    $dispatcher->shouldReceive('dispatch')->with(OnNewConnectionOpenEvent::class)->andReturn(resolve(null));
+    $dispatcher->expects('dispatch')->with(OnDataReceivedEvent::class)->andReturn(resolve(null));
 
-//     // Test initialization
-//     $connection = new Connection(
-//         messageHandlerInterface: $handlerSpy,
-//         messageProcessor: $messageProcessor,
-//         timeoutHandler: createTimeoutHandler(),
-//         ip: TEST_LOCAL_IP
-//     );
-//     $connection->onMessage(getHandshake());
-//     $connection->onMessage($helloFrame);
+    $connection = createSut($dispatcher);
+    $connection->onMessage(getHandshake());
+    $connection->onMessage('');
 
-//     $handlerSpy->shouldHaveReceived('onOpen')->once();
-//     $handlerSpy->shouldHaveReceived('handle')->with($message->getContent(), $connection)->once();
-// });
+    expect($connection->isHandshakeDone())->toBeTrue();
 
-// test('Should support binary message', function (): void {
-//     // Data and mock setup
-//     $handshake = getHandshake();
-//     $binary = readTempZip();
-//     $binaryFrame = hexArrayToString(['82', '7A']) . $binary;
-
-//     // Mock message properties
-//     $message = mockMessage(FrameTypeEnum::Binary, $binary);
-
-//     $messageProcessor = createMessageProcessor();
-
-//     $messageProcessor->shouldReceive('write')->withAnyArgs();
-//     $messageProcessor->shouldReceive('process')->with($binaryFrame, null)->andReturn(generateMessage($message));
-//     $handlerSpy = spy(MessageHandlerInterface::class);
-//     $handlerSpy->shouldReceive('supportsFrame')->withAnyArgs()->once()->andReturn(true);
-
-
-//     // Test initialization
-//     $connection = new Connection(
-//         messageHandlerInterface: $handlerSpy,
-//         messageProcessor: $messageProcessor,
-//         timeoutHandler: createTimeoutHandler(),
-//         ip: TEST_LOCAL_IP
-//     );
-//     $connection->onMessage($handshake);
-//     $connection->onMessage($binaryFrame);
-
-//     $handlerSpy->shouldHaveReceived('onOpen')->with($connection)->once();
-//     $handlerSpy->shouldHaveReceived('handle')->with($message->getContent(), $connection)->once();
-// });
+});
 
 test('Should call on disconnect correctly after successful handshake', function (): void {
     $dispatcher = mock(EventDispatcherInterface::class);
