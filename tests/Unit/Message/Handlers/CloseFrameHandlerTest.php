@@ -7,9 +7,6 @@ use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Message\Handlers\CloseFrameHandler;
 use Kit\Websocket\Message\Message;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use React\Socket\ConnectionInterface;
 use function Kit\Websocket\functions\hexArrayToString;
 use function Kit\Websocket\functions\intToBinaryString;
 use function Tests\Unit\Connection\createConnectionObject;
@@ -86,3 +83,4 @@ test('Should close with protocol error on wrong close code', function ($codeFram
             [6000, CloseFrameEnum::CLOSE_PROTOCOL_ERROR],
         ]
     );
+
