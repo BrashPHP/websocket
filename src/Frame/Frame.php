@@ -87,7 +87,7 @@ class Frame
     public function getContent(): string
     {
         $payload = $this->getPayload();
-        if ($this->getOpcode() === FrameTypeEnum::Text || $this->getOpcode() === FrameTypeEnum::Binary) {
+        if (in_array($this->getOpcode(), [FrameTypeEnum::Text, FrameTypeEnum::Binary], strict: true)) {
             return $payload;
         }
 
@@ -95,7 +95,7 @@ class Frame
         if ($len !== 0 && $this->getOpcode() === FrameTypeEnum::Close) {
             return BytesFromToStringFunction::getBytesFromToString(
                 $payload,
-                2,
+                0,
                 $len,
                 inspectionFrameEnum: InspectionFrameEnum::MODE_FROM_TO
             );
@@ -104,7 +104,7 @@ class Frame
         return $payload;
     }
 
-    public function getPayload()
+    public function getPayload(): string
     {
         return $this->framePayload->getPayload();
     }

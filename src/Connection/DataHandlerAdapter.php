@@ -24,7 +24,7 @@ final readonly class DataHandlerAdapter implements PromiseListenerInterface
     #[\Override]
     public function execute(Event $subject): PromiseInterface
     {
-        $handler = $this->dataHandlerFactory->create($subject->connection);
+        $handler = $this->dataHandlerFactory->create();
 
         return $handler->execute($subject);
     }

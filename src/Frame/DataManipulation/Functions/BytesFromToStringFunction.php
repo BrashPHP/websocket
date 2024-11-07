@@ -19,7 +19,7 @@ final class BytesFromToStringFunction
     public static function getBytesFromToString(string $frame, int $from, int $to, InspectionFrameEnum $inspectionFrameEnum): string
     {
         $length = match ($inspectionFrameEnum) {
-            InspectionFrameEnum::MODE_FROM_TO => $to - $from + 1 ,
+            InspectionFrameEnum::MODE_FROM_TO => $to - $from + 1,
             InspectionFrameEnum::MODE_PHP => $to,
         };
 

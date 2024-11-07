@@ -6,22 +6,19 @@ namespace Kit\Websocket\Message;
 
 use Generator;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Protocols\FrameHandlerInterface;
+use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Message\Message;
 use Kit\Websocket\Message\Orchestration\MessageOrchestrator;
 
 class MessageProcessor
 {
-    /** @var FrameHandlerInterface[] */
-    private array $handlers;
     private readonly MessageOrchestrator $messageOrchestrator;
 
     public function __construct(
-        private readonly MessageWriter $messageWriter,
-        private readonly MessageFactory $messageFactory
+        private readonly MessageFactory $messageFactory,
+        private readonly FrameFactory $frameFactory
     ) {
-        $this->messageOrchestrator = new MessageOrchestrator($messageWriter->getFrameFactory());
-        $this->handlers = [];
+        $this->messageOrchestrator = new MessageOrchestrator($frameFactory);
     }
 
     /**
@@ -45,7 +42,8 @@ class MessageProcessor
                     $messageBus->setData('');
 
                     if (!$response->isIncompleteException()) {
-                        $this->messageWriter->writeExceptionCode($response->getCloseType());
+                        // $this->messageWriter->writeExceptionCode($response->getCloseType()); JUST IN CASE
+                        yield $this->closeMessage($response->getCloseType());
 
                         break;
                     }
@@ -68,26 +66,20 @@ class MessageProcessor
                 }
 
             } catch (\Throwable) {
-                $this->messageWriter->writeExceptionCode(CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION);
+                // $this->messageWriter->writeExceptionCode(CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION);
+                yield $this->closeMessage(CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION);
 
                 $messageBus->setData(null);
             }
         } while ($messageBus->hasValidData());
     }
 
-    // public function addHandler(FrameHandlerInterface $handler): static
-    // {
-    //     $this->handlers[] = $handler;
+    private function closeMessage(CloseFrameEnum $closeCode): Message
+    {
+        $message = $this->messageFactory->createMessage();
+        $closeFrame = $this->frameFactory->createCloseFrame(status: $closeCode);
+        $message->addFrame($closeFrame);
 
-    //     return $this;
-    // }
-
-    // private function processHelper(Message $message): void
-    // {
-    //     foreach ($this->handlers as $handler) {
-    //         if ($handler->supports(message: $message)) {
-    //             $handler->process(message: $message, messageWriter: $this->messageWriter);
-    //         }
-    //     }
-    // }
+        return $message;
+    }
 }

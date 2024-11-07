@@ -11,9 +11,9 @@ use React\Socket\ConnectionInterface;
 class MessageWriter
 {
     public function __construct(
-        private FrameFactory $frameFactory,
-        private ConnectionInterface $socket,
-        private bool $writeMasked = false,
+        private readonly FrameFactory $frameFactory,
+        private readonly ConnectionInterface $socket,
+        private readonly bool $writeMasked = false,
     ) {
     }
 
@@ -55,7 +55,8 @@ class MessageWriter
         CloseFrameEnum $status = CloseFrameEnum::CLOSE_NORMAL,
         string $reason = null
     ): void {
-        $this->writeTextFrame($this->frameFactory->createCloseFrame($status, $reason));
+        $closeFrame = $this->frameFactory->createCloseFrame($status, $reason);
+        $this->writeTextFrame($closeFrame);
 
         $this->socket->end();
     }

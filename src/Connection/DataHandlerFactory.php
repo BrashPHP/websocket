@@ -3,6 +3,7 @@
 namespace Kit\Websocket\Connection;
 
 use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
+use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Handlers\OnDataReceivedHandler;
 use Kit\Websocket\Message\MessageFactory;
 use Kit\Websocket\Message\MessageProcessor;
@@ -11,15 +12,15 @@ use React\EventLoop\LoopInterface;
 
 final class DataHandlerFactory
 {
-    private TimeoutHandler $cachedtimeoutHandler;
+    private readonly TimeoutHandler $cachedtimeoutHandler;
     /**
      * @var \Kit\Websocket\Message\Protocols\MessageHandlerInterface[]
      */
     private array $messageHandlers = [];
 
     public function __construct(
-        private Config $config,
-        private LoopInterface $loopInterface
+        private readonly Config $config,
+        private readonly LoopInterface $loopInterface
     ) {
         $this->cachedtimeoutHandler = new TimeoutHandler(
             loop: $this->loopInterface,
@@ -27,17 +28,16 @@ final class DataHandlerFactory
         );
     }
 
-    public function appendMessageHandler(MessageHandlerInterface $messageHandlerInterface){
+    public function appendMessageHandler(MessageHandlerInterface $messageHandlerInterface)
+    {
         $this->messageHandlers[] = $messageHandlerInterface;
     }
 
-    public function create(Connection $connection): PromiseListenerInterface
+    public function create(): PromiseListenerInterface
     {
         $handler = new OnDataReceivedHandler(
             timeoutHandler: $this->cachedtimeoutHandler,
-            messageProcessor: $this->createMessageProcessor(
-                $connection
-            ),
+            messageProcessor: $this->createMessageProcessor(),
         );
 
         foreach ($this->messageHandlers as $messageHandler) {
@@ -47,13 +47,13 @@ final class DataHandlerFactory
         return $handler;
     }
 
-    private function createMessageProcessor(Connection $connection)
+    private function createMessageProcessor(): MessageProcessor
     {
         return new MessageProcessor(
-            messageWriter: $connection->getSocketWriter(),
             messageFactory: new MessageFactory(
                 maxMessagesBuffering: $this->config->maxMessagesBuffering
-            )
+            ),
+            frameFactory: new FrameFactory($this->config->maxPayloadSize),
         );
     }
 }

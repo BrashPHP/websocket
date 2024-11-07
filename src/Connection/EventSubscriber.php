@@ -15,6 +15,8 @@ use Kit\Websocket\Events\OnWebSocketExceptionEvent;
 use Kit\Websocket\Events\Protocols\ListenerProvider;
 use Kit\Websocket\Exceptions\WebSocketException;
 use Kit\Websocket\Handlers\OnUpgradeHandler;
+use Kit\Websocket\Message\Handlers\CloseFrameHandler;
+use Kit\Websocket\Message\Handlers\PingFrameHandler;
 use Kit\Websocket\Message\Message;
 use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
 
@@ -25,6 +27,8 @@ final readonly class EventSubscriber
         private DataHandlerFactory $dataHandlerFactory
     ) {
         $this->onUpgradeHandler();
+        $this->dataHandlerFactory->appendMessageHandler(new CloseFrameHandler());
+        $this->dataHandlerFactory->appendMessageHandler(new PingFrameHandler());
     }
 
     public function onNewConnection(OnConnectionOpenInterface|\Closure $newConnectionHandler): void
@@ -103,6 +107,8 @@ final readonly class EventSubscriber
                 }
             };
         }
+
+        $this->dataHandlerFactory->appendMessageHandler(messageHandlerInterface: $handler);
 
         $this->listenerProvider->addListener(
             OnDataReceivedEvent::class,

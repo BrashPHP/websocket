@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kit\Websocket\Message\Handlers;
 
 use Kit\Websocket\Connection\Connection;
+use Kit\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
@@ -31,7 +32,7 @@ class CloseFrameHandler implements MessageHandlerInterface
     {
         $frame = $message->getFirstFrame();
         $code = $this->getCloseType($frame);
-        $connection->close($code);
+        $connection->close(closeType: $code);
     }
 
     private function getCloseType(Frame $frame): CloseFrameEnum
@@ -45,7 +46,7 @@ class CloseFrameHandler implements MessageHandlerInterface
 
 
         if (frameSize($payload) > 1) {
-            $errorCode = ord($payload[0]) & 0xFF;
+            $errorCode = ByteSequenceFunction::bytesFromTo($payload, 0, 1);
             $existingCode = CloseFrameEnum::tryFrom($errorCode);
             $isValidRange = $errorCode >= 1000 && $errorCode <= 4999;
             $isWebsocketCode = $errorCode >= 1000 && $errorCode < 3000;

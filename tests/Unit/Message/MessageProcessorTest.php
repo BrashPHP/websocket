@@ -25,14 +25,7 @@ function createMockConnection(): MockInterface|ConnectionInterface
 
 function createSut(): MessageProcessor
 {
-    /** @var ConnectionInterface|\Mockery\MockInterface */
-    $mockServer = mock(ConnectionInterface::class);
-    $mockServer->shouldReceive('write')->withAnyArgs();
-    $mockServer->shouldReceive('end')->withAnyArgs();
-    $messageWriter = createMessageWriter(connectionInterface: $mockServer);
-    $messageFactory = new MessageFactory(maxMessagesBuffering: null);
-
-    return new MessageProcessor($messageWriter, $messageFactory);
+    return new MessageProcessor(new MessageFactory(), new FrameFactory());
 }
 
 test('should build many messages with only one frame data', function (): void {
@@ -142,8 +135,7 @@ test('Should assure that writes frames', function (): void {
 test('Should achieve a limitation exception due to large message', function (): void {
     $mockServer = createMockConnection();
     $factory = new FrameFactory();
-    $messageWriter = createMessageWriter(connectionInterface: $mockServer);
-    $processor = new MessageProcessor($messageWriter, new MessageFactory(maxMessagesBuffering: 2));
+    $processor = new MessageProcessor(new MessageFactory(maxMessagesBuffering: 2), new FrameFactory());
     $closeFrame = $factory->createCloseFrame(CloseFrameEnum::CLOSE_TOO_BIG_TO_PROCESS);
     $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
     $mockServer->shouldReceive('end')->withAnyArgs();
@@ -156,7 +148,8 @@ test('Should achieve a limitation exception due to large message', function (): 
         $longMessageFrame,
     ));
 
-    expect($messages)->toBeEmpty();
+    expect($messages)->toHaveCount(1);
+    expect($messages[0]->getOpcode())->toBe(FrameTypeEnum::Close);
 });
 
 test('Should support message in many frames', function (): void {
@@ -286,9 +279,7 @@ test('Should should process ping between two text frames', function (): void {
 test('Should catch wrong continuation frame exception', function (): void {
     $mockServer = createMockConnection();
     $frameFactory = new FrameFactory();
-    $processor = new MessageProcessor(createMessageWriter(
-        connectionInterface: $mockServer,
-    ), messageFactory: new MessageFactory(null));
+    $processor = new MessageProcessor(messageFactory: new MessageFactory(null), frameFactory: new FrameFactory());
     $closeFrame = $frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
     $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
     $mockServer->shouldReceive('end')->withAnyArgs();
@@ -297,7 +288,13 @@ test('Should catch wrong continuation frame exception', function (): void {
         hexArrayToString(['80', '98', '53', '3d', 'b9', 'b3', '3d', '52', 'd7', '9e', '30', '52', 'd7', 'c7', '3a', '53', 'cc', 'd2', '27', '54', 'd6', 'dd', '73', '4d', 'd8', 'ca', '3f', '52', 'd8', 'd7']),
     ));
 
-    expect($messages)->toBeEmpty();
+    expect($messages)->toHaveCount(1);
+    /** @var Message */
+    $message = array_pop($messages);
+    expect($message->isComplete())->toBeTrue();
+    expect($message->isContinuationMessage())->toBeFalse();
+    expect($message->getOpcode())->toBe(FrameTypeEnum::Close);
+    expect(hexdec(bin2hex($message->getContent())))->toBe(1002);
 });
 
 test(
@@ -341,10 +338,8 @@ test(
         ]);
         $mockServer = mock(ConnectionInterface::class);
         $frameFactory = new FrameFactory();
-        $processor = new MessageProcessor(
-            messageWriter: createMessageWriter($frameFactory, $mockServer),
-            messageFactory: new MessageFactory(maxMessagesBuffering: 2)
-        );
+        $processor = new MessageProcessor(messageFactory: new MessageFactory(2), frameFactory: new FrameFactory());
+
         $closeFrame = $frameFactory->createCloseFrame(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
         $mockServer->shouldReceive('write')->with($closeFrame->getRawData());
         $mockServer->shouldReceive('end')->withAnyArgs();
@@ -354,6 +349,12 @@ test(
             $multipleFrameData,
         ));
 
-        expect($messages)->toBeEmpty();
+        expect($messages)->toHaveCount(1);
+        /** @var Message */
+        $message = array_pop($messages);
+        expect($message->isComplete())->toBeTrue();
+        expect($message->isContinuationMessage())->toBeFalse();
+        expect($message->getOpcode())->toBe(FrameTypeEnum::Close);
+        expect(hexdec(bin2hex($message->getContent())))->toBe(1002);
     }
 );

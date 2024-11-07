@@ -21,8 +21,8 @@ final class OnDataReceivedHandler implements PromiseListenerInterface
 {
 
     public function __construct(
-        private TimeoutHandler $timeoutHandler,
-        private MessageProcessor $messageProcessor,
+        private readonly TimeoutHandler $timeoutHandler,
+        private readonly MessageProcessor $messageProcessor,
         /** @var MessageHandlerInterface[]*/
         private array $messageHandlers = []
     ) {
