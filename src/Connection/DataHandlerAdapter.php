@@ -28,7 +28,5 @@ final readonly class DataHandlerAdapter implements PromiseListenerInterface
 
         return $handler->execute($subject);
     }
-
-
 }
 

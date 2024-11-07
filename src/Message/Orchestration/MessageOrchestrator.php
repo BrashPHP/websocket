@@ -23,7 +23,8 @@ final class MessageOrchestrator
     {
         $this->buffer = '';
         $this->messageValidator = new ValidateOpCode();
-        $this->messageValidator
+        $this
+            ->messageValidator
             ->setNext(new ValidateFrame())
             ->setNext(new CanIncludeFrame());
     }
