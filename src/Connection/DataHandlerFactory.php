@@ -2,6 +2,7 @@
 
 namespace Kit\Websocket\Connection;
 
+use Kit\Websocket\Config\Config;
 use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
 use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Handlers\OnDataReceivedHandler;

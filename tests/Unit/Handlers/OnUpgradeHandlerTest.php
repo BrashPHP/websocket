@@ -16,7 +16,7 @@ test('should receive event correctly', function (): void {
     $connectionInterfaceMock = mock(ConnectionInterface::class);
     $connectionInterfaceMock->shouldReceive('write')->with(
         'HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: '
-        . 'Upgrade\r\nsec-webSocket-accept: nl8AwnZur2jxjO83O32/6MVk6Pw=\r\n\r\n'
+        . 'Upgrade\r\nSec-WebSocket-Accept: nl8AwnZur2jxjO83O32/6MVk6Pw=\r\n\r\n'
     );
     $handler = new OnUpgradeHandler();
 

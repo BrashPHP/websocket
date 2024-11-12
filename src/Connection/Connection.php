@@ -91,6 +91,11 @@ class Connection
         }
     }
 
+    public function writeText(string|Frame $frame)
+    {
+        $this->write($frame, FrameTypeEnum::Text);
+    }
+
     public function onError($data)
     {
         $message = "A connectivity error occurred: $data";
@@ -103,11 +108,22 @@ class Connection
 
     protected function handshake(string $data): void
     {
+        try {
+            $request = RequestFactory::createRequest($data);
+        } catch (\Throwable $th) {
+            $errorMessage = "<html><h1>Bad Request!</h1><pre>{$th->getMessage()}</pre></html>\r\n";
 
-        $request = RequestFactory::createRequest($data);
+            $this->messageWriter->write("HTTP/1.1 400 OK\r\nContent-Length: " .
+                strlen($errorMessage) . "\r\nConnection: close\r\n\r\n" .
+                $errorMessage);
+
+            return;
+        }
         $this->eventDispatcher->dispatch(new OnUpgradeEvent(
             $request
-        ))->then(onFulfilled: function (string $handshakeResponse): void {
+        ))
+            ->then(onFulfilled: function (string $handshakeResponse): void {
+                $this->logger->debug("Handshake: $handshakeResponse");
                 $this->messageWriter->write($handshakeResponse);
                 $this->handshakeDone = true;
                 $this->eventDispatcher->dispatch(new OnNewConnectionOpenEvent($this));
@@ -121,6 +137,7 @@ class Connection
 
     protected function processMessage(string $data): void
     {
+        $this->logger->debug("Received data", ['data' => $data]);
         $this->eventDispatcher->dispatch(new OnDataReceivedEvent($data, $this));
     }
 
@@ -130,7 +147,8 @@ class Connection
         $this->messageWriter->close(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
     }
 
-    public function isHandshakeDone(){
+    public function isHandshakeDone()
+    {
         return $this->handshakeDone;
     }
 }

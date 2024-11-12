@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kit\Websocket\Message\Protocols;
 
 use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Message\Message;
 
 interface MessageHandlerInterface

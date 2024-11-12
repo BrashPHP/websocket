@@ -47,7 +47,10 @@ final readonly class EventSubscriber
             };
         }
 
-        $this->listenerProvider->addListener(OnNewConnectionOpenEvent::class, $handler);
+        $this->listenerProvider->addListener(
+            OnNewConnectionOpenEvent::class,
+            fn(OnNewConnectionOpenEvent $event) => $handler->onOpen($event->connection)
+        );
     }
 
     public function onDisconnect(OnDisconnecedConnectiontInterface|\Closure $disconnectionHandler): void
@@ -66,7 +69,10 @@ final readonly class EventSubscriber
             };
         }
 
-        $this->listenerProvider->addListener(OnDisconnectEvent::class, $handler);
+        $this->listenerProvider->addListener(
+            OnDisconnectEvent::class,
+            fn(OnDisconnectEvent $event) => $handler->onDisconnect($event->connection)
+        );
     }
 
     public function onError(OnConnectionErrorInterface|\Closure $disconnectionHandler): void
@@ -85,7 +91,10 @@ final readonly class EventSubscriber
             };
         }
 
-        $this->listenerProvider->addListener(OnWebSocketExceptionEvent::class, $handler);
+        $this->listenerProvider->addListener(
+            OnWebSocketExceptionEvent::class,
+            fn(OnWebSocketExceptionEvent $event) => $handler->onError($event->webSocketException, $event->connection)
+        );
     }
 
     public function onMessageReceived(MessageHandlerInterface|\Closure $messageHandlerInterface)

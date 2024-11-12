@@ -87,9 +87,9 @@ class Uri implements JsonSerializable, Stringable, UriInterface
      * @param string $uri_string URI as string
      * @throws \InvalidArgumentException If the given URI cannot be parsed
      */
-    public function __construct(string $uri_string = '')
+    public function __construct(string $uriString = '')
     {
-        $this->parse($uri_string);
+        $this->parse($uriString);
     }
 
 

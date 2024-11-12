@@ -22,7 +22,7 @@ if (!function_exists('generateKey')) {
 if (!function_exists('generateAcceptFromKey')) {
 
     /**
-     * Generates the value for the Sec-Websocket-Accept header based on the given Sec-Websocket-Key header value.
+     * Generates the value for the Sec-WebSocket-Accept header based on the given Sec-Websocket-Key header value.
      */
     function generateAcceptFromKey(string $key): string
     {
@@ -32,7 +32,7 @@ if (!function_exists('generateAcceptFromKey')) {
 
 if (!function_exists('validateAcceptForKey')) {
     /**
-     * Determines if the Sec-Websocket-Accept value given matches the expected value for the Sec-Websocket-Key header.
+     * Determines if the Sec-WebSocket-Accept value given matches the expected value for the Sec-Websocket-Key header.
      */
     function validateAcceptForKey(string $accept, string $key): bool
     {

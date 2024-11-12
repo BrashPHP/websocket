@@ -1,5 +1,8 @@
 <?php
 
+use Kit\Websocket\Config\Config;
+use Kit\Websocket\Message\Protocols\AbstractTextMessageHandler;
+use Kit\Websocket\WsServer;
 use React\EventLoop\Loop;
 use React\Promise\Promise;
 use function React\Async\{await, async};
@@ -7,30 +10,17 @@ use function Kit\Websocket\functions\println;
 
 require_once 'vendor/autoload.php';
 
-Loop::addTimer(0.5, async(function () {
-    println('a');
-    $value = async(function(){
-        $fiber = new Fiber(function($firstValue){
-            sleep(1);
-            println('Test');
-            Fiber::suspend();
-            println($firstValue);
-        }) ;
-        println('d');
-        $fiber->start('Blablabla');
-        println("Started fiber");
-        $fiber->resume();
-    });
-    $value();
-    println('c');
-}));
-
-Loop::addTimer(1.0, function () {
-    println('b');
-});
-
-Loop::addTimer(3.0, function () {
-    println('finished');
-});
-
-Loop::run();
+$server = new WsServer(1337, config: new Config(
+    prod: false
+));
+$server->setConnectionHandler(
+    connectionHandlerInterface: new class extends AbstractTextMessageHandler {
+    public function handleTextData(string $data, Kit\Websocket\Connection\Connection $connection): void
+    {
+        $connection->getLogger()->debug("IP" . ":" . $connection->getIp() . PHP_EOL);
+        $connection->getLogger()->debug("Data: " . $data . PHP_EOL);
+        $connection->writeText(strtoupper($data));
+    }
+    }
+);
+$server->start();

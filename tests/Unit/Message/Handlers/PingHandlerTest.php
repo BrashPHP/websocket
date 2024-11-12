@@ -10,7 +10,7 @@ use Kit\Websocket\Message\MessageWriter;
 use function Kit\Websocket\functions\hexArrayToString;
 
 
-test('Should process close frame', function () {
+test('Should process close frame', function (): void {
     $handler = new PingFrameHandler();
     $pingMessage = new Message();
     $factory = new FrameFactory();
@@ -18,7 +18,7 @@ test('Should process close frame', function () {
     expect($handler->hasSupport($pingMessage))->toBeTrue();
 });
 
-test('Should process ping frame', function () {
+test('Should process ping frame', function (): void {
     $handler = new PingFrameHandler();
     $pingMessage = new Message();
     $factory = new FrameFactory();

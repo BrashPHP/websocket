@@ -22,7 +22,7 @@ function createMessage(): Message
     return new Message();
 }
 
-test('Should process close frame', function () {
+test('Should process close frame', function (): void {
     $sut = createSut();
     $factory = new FrameFactory();
     $closeFrame = $factory->createCloseFrame();
@@ -34,7 +34,7 @@ test('Should process close frame', function () {
     $conn->shouldHaveReceived('close')->with(CloseFrameEnum::CLOSE_NORMAL);
 });
 
-test('Should process close frame from raw data', function () {
+test('Should process close frame from raw data', function (): void {
     $sut = createSut();
     $factory = new FrameFactory();
     $closeFrame = $factory->newFrameFromRawData(rawData: hexArrayToString(['88', '02', '03', 'E8']));
@@ -46,7 +46,7 @@ test('Should process close frame from raw data', function () {
     $conn->shouldHaveReceived('close')->with(CloseFrameEnum::CLOSE_NORMAL);
 });
 
-test('Should close with protocol error when frame is not valid', function () {
+test('Should close with protocol error when frame is not valid', function (): void {
     $frameFactory = new FrameFactory();
 
     // Normal close frame without mask
@@ -61,7 +61,7 @@ test('Should close with protocol error when frame is not valid', function () {
     $conn->shouldHaveReceived('close')->with(CloseFrameEnum::CLOSE_PROTOCOL_ERROR);
 });
 
-test('Should close with protocol error on wrong close code', function ($codeFrameIn, $codeFrameOut) {
+test('Should close with protocol error on wrong close code', function ($codeFrameIn, $codeFrameOut): void {
     $frameIn = intToBinaryString($codeFrameIn, 2);
     $frameFactory = new FrameFactory();
     $frameFactory->createCloseFrame();
