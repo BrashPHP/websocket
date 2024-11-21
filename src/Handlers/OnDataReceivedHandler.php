@@ -8,6 +8,9 @@ use Kit\Websocket\Connection\TimeoutHandler;
 use Kit\Websocket\Events\Protocols\Event;
 use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
 
+use Kit\Websocket\Message\Handlers\MessageDeflateProxyHandler;
+use Kit\Websocket\Message\Handlers\MessageDeflaterHandler;
+use Kit\Websocket\Message\Message;
 use Kit\Websocket\Message\MessageProcessor;
 use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
 use React\Promise\Deferred;
@@ -19,6 +22,7 @@ use Kit\Websocket\Events\OnDataReceivedEvent;
  */
 final class OnDataReceivedHandler implements PromiseListenerInterface
 {
+    private readonly MessageDeflateProxyHandler $messageDeflaterHandler;
 
     public function __construct(
         private readonly TimeoutHandler $timeoutHandler,
@@ -26,6 +30,7 @@ final class OnDataReceivedHandler implements PromiseListenerInterface
         /** @var MessageHandlerInterface[]*/
         private array $messageHandlers = []
     ) {
+        $this->messageDeflaterHandler = new MessageDeflateProxyHandler();
     }
 
     /**
@@ -47,6 +52,9 @@ final class OnDataReceivedHandler implements PromiseListenerInterface
             if ($currentMessage->isComplete()) {
                 foreach ($this->messageHandlers as $handler) {
                     if ($handler->hasSupport($currentMessage)) {
+                        if ($conn->isCompressionEnabled()) {
+                            $handler = $this->messageDeflaterHandler->proxy($handler);
+                        }
                         $handler->handle($currentMessage, connection: $conn);
                     }
                 }

@@ -40,16 +40,16 @@ final class FrameBuilder
         $payloadLen = frameSize($payload);
         $payloadLenSize = 7;
 
-        if ($payloadLen > 126 && $payloadLen < 65536) {
+        if ($payloadLen > 126 && $payloadLen < (2**16)) {
             $payloadLenSize += 16;
-        } elseif ($payloadLen > 126) {
+        } elseif ($payloadLen >= (2**16)) {
             $payloadLenSize += 64;
         }
 
         $mask = $createMask ? random_bytes(4) : "";
         $framePayload = new FramePayload($payload, $payloadLen, $payloadLenSize, $mask);
 
-        $metadata = new FrameMetadata(firstByte: 128);
+        $metadata = new FrameMetadata(fin: true, rsv1: false, rsv2: false,  rsv3: false);
 
         return new Frame(
             $frameTypeEnum,
@@ -63,7 +63,7 @@ final class FrameBuilder
      */
     public function processMetadata(int $firstByte): FrameMetadata
     {
-        return new FrameMetadata(firstByte: $firstByte);
+        return FrameMetadata::fromByte(firstByte: $firstByte);
     }
 
     /**

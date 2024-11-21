@@ -8,25 +8,38 @@ use function Kit\Websocket\functions\validateByte;
 final readonly class FrameMetadata
 {
     /**
-     * Indicates whether this frame is final or not
+     *
+     * This class contains information regarding a frame metadata, such RSVs and fin code.
+     * RSVs are related to extensions used in a websocket, while fin code tells if it is a final frame.
+     *
+     * @param bool $fin Indicates whether this frame is final or not
+     * @param bool $rsv1 RSV1 is also called "Per-Message Compressed" bit
+     * @param bool $rsv2
+     * @param bool $rsv3
      */
-    public bool $fin;
-    /**
-     * RSVs are related to extensions used in a websocket
-     */
-    public bool $rsv1;
-    public bool $rsv2;
-    public bool $rsv3;
+    public function __construct(
+        public bool $fin,
+        public bool $rsv1,
+        public bool $rsv2,
+        public bool $rsv3
+    ) {
+    }
 
-
-    public function __construct(private int $firstByte)
+    public static function fromByte(int $firstByte)
     {
         validateByte($firstByte);
 
-        $this->fin = boolval(nthBitFromByte($this->firstByte, 1));
-        $this->rsv1 = boolval(nthBitFromByte($this->firstByte, 2));
-        $this->rsv2 = boolval(nthBitFromByte($this->firstByte, 3));
-        $this->rsv3 = boolval(nthBitFromByte($this->firstByte, 4));
+        $fin = boolval(nthBitFromByte($firstByte, 1));
+        $rsv1 = boolval(nthBitFromByte($firstByte, 2));
+        $rsv2 = boolval(nthBitFromByte($firstByte, 3));
+        $rsv3 = boolval(nthBitFromByte($firstByte, 4));
+
+        return new self(
+            $fin,
+            $rsv1,
+            $rsv2,
+            $rsv3,
+        );
     }
 
     /**

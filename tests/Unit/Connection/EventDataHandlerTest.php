@@ -40,7 +40,7 @@ test('Should support text message', function (): void {
         messageHandlers: [$handlerSpy]
     );
 
-    $connection = mock(Connection::class);
+    $connection = mock(Connection::class)->makePartial();
 
     $handler->execute(new OnDataReceivedEvent($helloFrame, $connection));
 
@@ -61,7 +61,7 @@ test('Should support binary message', function (): void {
     $handlerSpy = spy(MessageHandlerInterface::class);
     $handlerSpy->shouldReceive('hasSupport')->withAnyArgs()->once()->andReturn(true);
 
-    $connection = mock(Connection::class);
+    $connection = mock(Connection::class)->makePartial();
 
     // Test initialization
     $handler = new OnDataReceivedHandler(
@@ -93,7 +93,10 @@ test('Should handle special messages with handler', function (): void {
         mockMessage(FrameTypeEnum::Close, '')
     ));
 
-    $connection = mock(Connection::class);
+    /**
+     * @var Connection|\Mockery\MockInterface
+     */
+    $connection = mock(Connection::class)->makePartial();
     $connection->expects('close')->with(CloseFrameEnum::CLOSE_NORMAL);
     $handler = new OnDataReceivedHandler(
         messageProcessor: $messageProcessor,

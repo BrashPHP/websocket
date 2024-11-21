@@ -35,7 +35,6 @@ abstract class AbstractTextMessageHandler implements ConnectionHandlerInterface
     public function onOpen(Connection $connection): void
     {
         $connection->getLogger()->info("New Connection added!") ;
-        // $connection->writeText('Hello');
     }
 
     #[\Override]

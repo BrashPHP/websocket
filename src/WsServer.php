@@ -35,7 +35,7 @@ class WsServer
      */
     private array $messageHandlers;
 
-    private SplObjectStorage $connections;
+    private readonly SplObjectStorage $connections;
     private ServerInterface $server;
     private readonly EventDispatcherInterface $eventDispatcher;
     private readonly EventSubscriber $subscriber;
@@ -94,7 +94,7 @@ class WsServer
 
         $this->server->on(
             'connection',
-            function (ConnectionInterface $connectionInterface) {
+            function (ConnectionInterface $connectionInterface): void {
                 $this->newConnection($connectionInterface);
             }
         );
