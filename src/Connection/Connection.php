@@ -146,7 +146,7 @@ class Connection
             $this->eventDispatcher->dispatch(new OnUpgradeEvent(
                 $request
             ))
-                ->then(onFulfilled: function (string $handshakeResponse): void {
+                ->then(function (string $handshakeResponse): void {
                     if ($this->isCompressionEnabled()) {
                         $handshakeResponse = $this->compression->attachToStringResponse($handshakeResponse);
                     }
@@ -155,7 +155,7 @@ class Connection
                     $this->handshakeDone = true;
                     $this->eventDispatcher->dispatch(new OnNewConnectionOpenEvent($this));
                 })
-                ->catch(onRejected: function (WebSocketException $webSocketException): void {
+                ->catch(function (WebSocketException $webSocketException): void {
                     $this->messageWriter->close(CloseFrameEnum::CLOSE_NORMAL);
                     $this->logger->notice('Connection to ' . $this->ip . ' closed with error : ' . $webSocketException->getMessage());
                     $this->eventDispatcher->dispatch(new OnWebSocketExceptionEvent($webSocketException, $this));
