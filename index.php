@@ -3,12 +3,7 @@
 use Kit\Websocket\Config\Config;
 use Kit\Websocket\Connection\Connection;
 use Kit\Websocket\Message\Protocols\AbstractTextMessageHandler;
-use Kit\Websocket\Watcher\Watch;
 use Kit\Websocket\WsServer;
-use React\EventLoop\Loop;
-use React\Promise\Promise;
-use function React\Async\{await, async};
-use function Kit\Websocket\functions\println;
 
 require_once 'vendor/autoload.php';
 
@@ -38,11 +33,6 @@ $server->setConnectionHandler(
         $broadcast = array_filter($this->connections, fn($conn) => $conn !== $connection);
 
         foreach ($broadcast as $conn) {
-            // $conn->writeText(strtoupper(sprintf(
-            //     "%s ip says: %s",
-            //     $connection->getIp(),
-            //     $data
-            // )));
             $conn->writeText($data);
         }
     }
