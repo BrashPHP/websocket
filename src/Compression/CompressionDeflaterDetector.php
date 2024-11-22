@@ -43,6 +43,9 @@ final class CompressionDeflaterDetector
 
     private function validateWindowSize(mixed $value, string $field): void
     {
+        if ($value === null) {
+            return;
+        }
         if (!is_int($value) || $value < 9 || $value > 15) {
             $this->errors[] = new InvalidWindowSizeException($field);
         }

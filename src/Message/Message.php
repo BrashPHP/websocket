@@ -8,7 +8,6 @@ use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
 use Kit\Websocket\Message\Exceptions\LimitationException;
 use Kit\Websocket\Message\Exceptions\MissingDataException;
-use Kit\Websocket\Message\Exceptions\WrongEncodingException;
 
 
 final class Message
@@ -55,10 +54,6 @@ final class Message
 
         $this->isComplete = $frame->isFinal();
         $this->frames[] = $frame;
-
-        if ($this->isComplete() && !$this->validDataEncoding()) {
-            return new WrongEncodingException('The text is not encoded in UTF-8.');
-        }
 
         return null;
     }

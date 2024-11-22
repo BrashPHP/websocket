@@ -36,7 +36,11 @@ $server->setConnectionHandler(
         $connection->getLogger()->debug("IP" . ":" . $connection->getIp() . PHP_EOL);
         $connection->getLogger()->debug("Data: " . $data . PHP_EOL);
         foreach ($this->connections as $conn) {
-            $conn->writeText(sprintf("%s ip says: %s", $connection->getIp(), $data));
+            $conn->writeText(sprintf(
+                "%s ip says: %s",
+                $connection->getIp(),
+                $data
+            ));
         }
     }
     }

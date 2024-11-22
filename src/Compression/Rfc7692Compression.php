@@ -6,6 +6,7 @@ namespace Kit\Websocket\Compression;
 
 use Kit\Websocket\Compression\CompressionConf;
 use Kit\Websocket\Compression\Exceptions\BadCompressionException;
+use function Kit\Websocket\functions\frameSize;
 
 final readonly class Rfc7692Compression
 {
@@ -67,11 +68,15 @@ final readonly class Rfc7692Compression
             return null;
         }
 
-        return $data ?: null;
+        return $data;
     }
 
     public function compress(string $data, bool $isFinal): string
     {
+        if (frameSize($data) < self::MINIMUM_LENGTH || $isFinal) {
+            return $data;
+        }
+        
         try {
             $data = \deflate_add($this->deflate, $data, $this->sendingFlushMode);
         } catch (\Throwable $th) {

@@ -2,14 +2,16 @@
 
 namespace Kit\Websocket\Compression;
 
+use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
+use Kit\Websocket\Frame\FrameFactory;
 use Kit\Websocket\Frame\FrameMetadata;
 use Kit\Websocket\Frame\FramePayload;
 use function Kit\Websocket\functions\frameSize;
 
 readonly final class ServerCompressionContext
 {
-    private Rfc7692Compression $compressor;
+    public Rfc7692Compression $compressor;
 
     public function __construct(
         public CompressionConf $compressionConf
@@ -29,8 +31,12 @@ readonly final class ServerCompressionContext
         );
     }
 
-    public function deflateFrame(Frame $frame): Frame
+    public function deflateFrame(Frame|string $frame): Frame
     {
+        if (is_string($frame)) {
+            $frameFactory = new FrameFactory();
+            $frame = $frameFactory->newFrame($frame, frameTypeEnum: FrameTypeEnum::Text, writeMask: false);
+        }
         if ($frame->getMetadata()->rsv1) {
             return $frame; // Already deflated
         }
@@ -43,16 +49,20 @@ readonly final class ServerCompressionContext
 
     public function inflateFrame(Frame $frame): Frame
     {
-        return $this->processFrame(
-            $frame,
-            fn($payload, $isFinal) => $this->compressor->decompress($payload, $isFinal)
-        );
+        if ($frame->getMetadata()->rsv1) {
+            return $this->processFrame(
+                $frame,
+                fn($payload, $isFinal) => $this->compressor->decompress($payload, $isFinal)
+            );
+        }
+
+        return $frame;
     }
 
     private function processFrame(Frame $frame, callable $processor): Frame
     {
         $payload = $processor($frame->getPayload(), $frame->isFinal());
-        $payloadLen = frameSize($payload);
+        $payloadLen = frameSize($payload ?? "");
         $payloadLenSize = match (true) {
             $payloadLen > 126 && $payloadLen < (2 ** 16) => 23,
             $payloadLen >= (2 ** 16) => 71,
@@ -63,7 +73,7 @@ readonly final class ServerCompressionContext
             $frame->getOpcode(),
             new FrameMetadata(
                 fin: $frame->isFinal(),
-                rsv1: true,
+                rsv1: false,
                 rsv2: false,
                 rsv3: false
             ),

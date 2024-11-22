@@ -65,7 +65,8 @@ class MessageProcessor
                     yield $message;
                 }
 
-            } catch (\Throwable) {
+            } catch (\Throwable $th) {
+                dump($th);
                 yield $this->closeMessage(CloseFrameEnum::CLOSE_UNEXPECTING_CONDITION);
 
                 $messageBus->setData(null);

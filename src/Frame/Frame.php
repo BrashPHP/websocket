@@ -71,7 +71,7 @@ class Frame
 
     private function buildInitialDataPortion(int $firstLen): string
     {
-        $newHalfFirstByte = (intval($this->isFinal())) << 7;
+        $newHalfFirstByte = (intval($this->isFinal()) << 7) + (intval($this->metadata->rsv1) << 6);
         $newFirstByte = ($newHalfFirstByte + $this->opcode->value) << 8;
         $newSecondByte = ($this->framePayload->isMasked() << 7) + $firstLen;
 

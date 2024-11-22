@@ -160,7 +160,7 @@ class Connection
 
     protected function processMessage(string $data): void
     {
-        $this->logger->debug("Received data", ['data' => $data]);
+        $this->logger->debug("Received data");
         $this->eventDispatcher->dispatch(new OnDataReceivedEvent($data, $this));
     }
 

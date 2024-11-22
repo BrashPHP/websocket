@@ -50,7 +50,6 @@ final readonly class FrameMetadata
     public function isUnsupportedExtension(): bool
     {
         $unsupportedExtensions = [
-            $this->rsv1,
             $this->rsv2,
             $this->rsv3
         ];
