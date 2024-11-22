@@ -13,6 +13,7 @@
     "psr/http-message": "^2.0@dev",
     "react/async": "^4.2",
     "react/event-loop": "^1.5",
+    "react/promise": "^3.2.0",
     "react/socket": "^1.0",
     "react/stream": "^1.0",
     "revolt/event-loop-adapter-react": "^1.1"
