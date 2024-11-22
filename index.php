@@ -12,7 +12,7 @@ use function Kit\Websocket\functions\println;
 
 require_once 'vendor/autoload.php';
 
-$server = new WsServer(1337, config: new Config(
+$server = new WsServer(1337, host: '0.0.0.0', config: new Config(
     prod: false
 ));
 $server->setConnectionHandler(
@@ -35,12 +35,15 @@ $server->setConnectionHandler(
     {
         $connection->getLogger()->debug("IP" . ":" . $connection->getIp() . PHP_EOL);
         $connection->getLogger()->debug("Data: " . $data . PHP_EOL);
-        foreach ($this->connections as $conn) {
-            $conn->writeText(sprintf(
-                "%s ip says: %s",
-                $connection->getIp(),
-                $data
-            ));
+        $broadcast = array_filter($this->connections, fn($conn) => $conn !== $connection);
+
+        foreach ($broadcast as $conn) {
+            // $conn->writeText(strtoupper(sprintf(
+            //     "%s ip says: %s",
+            //     $connection->getIp(),
+            //     $data
+            // )));
+            $conn->writeText($data);
         }
     }
     }

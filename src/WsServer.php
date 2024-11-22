@@ -10,7 +10,6 @@ use Kit\Websocket\Connection\EventSubscriber;
 use Kit\Websocket\Events\Protocols\ListenerProvider;
 use Kit\Websocket\Events\Protocols\PromiseEventDispatcher;
 use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Http\Uri;
 use Kit\Websocket\Message\MessageWriter;
 use Kit\Websocket\Message\Protocols\ConnectionHandlerInterface;
 use Monolog\Handler\StreamHandler;

@@ -9,7 +9,7 @@ use React\Socket\ServerInterface;
 
 final class SslServerFactory
 {
-    public function createServer(ServerInterface $serverInterface, LoopInterface $loopInterface, SslConfig $config, ): ServerInterface
+    public function createServer(ServerInterface $serverInterface, LoopInterface $loopInterface, SslConfig $config): ServerInterface
     {
         return new SecureServer(
             $serverInterface,

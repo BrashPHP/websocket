@@ -9,7 +9,6 @@
   "type": "library",
   "require": {
     "php": "^8.3.0",
-    "phpoption/phpoption": "^1.9",
     "psr/event-dispatcher": "^1.0@dev",
     "psr/http-message": "^2.0@dev",
     "react/async": "^4.2",
