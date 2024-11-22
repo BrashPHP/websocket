@@ -16,7 +16,7 @@ function createRequestMock(): RequestInterface|MockInterface
     return mock(RequestInterface::class);
 }
 
-it('returns null if Sec-WebSocket-Extensions header is missing', function () {
+it('returns null if Sec-WebSocket-Extensions header is missing', function (): void {
     $request = createRequestMock();
     $request->shouldReceive("getHeaderLine")->andReturn('');
 
@@ -25,7 +25,7 @@ it('returns null if Sec-WebSocket-Extensions header is missing', function () {
     expect($detector->detect($request))->toBeNull();
 });
 
-it('returns null if header does not start with permessage-deflate', function () {
+it('returns null if header does not start with permessage-deflate', function (): void {
     $request = createRequestMock();
     $request->shouldReceive("getHeaderLine")->andReturn('other-extension; key=value');
 
@@ -34,7 +34,7 @@ it('returns null if header does not start with permessage-deflate', function () 
     expect($detector->detect($request))->toBeNull();
 });
 
-it('throws CompressionErrorsCollectionException for invalid window size', function () {
+it('throws CompressionErrorsCollectionException for invalid window size', function (): void {
     $request = createRequestMock();
     $request->shouldReceive("getHeaderLine")->andReturn('permessage-deflate; server_max_window_bits=7');
 
@@ -43,7 +43,7 @@ it('throws CompressionErrorsCollectionException for invalid window size', functi
     $detector->detect($request);
 })->throws(CompressionErrorsCollectionException::class);
 
-it('throws InvalidTakeoverException for invalid takeover value', function () {
+it('throws InvalidTakeoverException for invalid takeover value', function (): void {
     $request = createRequestMock();
     $request->shouldReceive('getHeaderLine')->andReturn('permessage-deflate; client_no_context_takeover=value');
 
@@ -52,7 +52,7 @@ it('throws InvalidTakeoverException for invalid takeover value', function () {
     $detector->detect($request);
 })->throws(CompressionErrorsCollectionException::class);
 
-it('returns a ServerCompressionContext for valid configuration', function () {
+it('returns a ServerCompressionContext for valid configuration', function (): void {
     $request = createRequestMock();
     $request->shouldReceive("getHeaderLine")->andReturn('permessage-deflate; server_max_window_bits=15');
 

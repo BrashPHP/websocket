@@ -65,7 +65,7 @@ class Connection
             $this->processMessage($data);
     }
 
-    public function onEnd()
+    public function onEnd(): void
     {
         if ($this->handshakeDone) {
             $this->eventDispatcher->dispatch(new OnDisconnectEvent($this));
@@ -76,7 +76,7 @@ class Connection
         }
     }
 
-    public function close(CloseFrameEnum $closeType, ?string $reason = null)
+    public function close(CloseFrameEnum $closeType, ?string $reason = null): void
     {
         $this->messageWriter->close($closeType, $reason);
     }
@@ -98,7 +98,7 @@ class Connection
         }
     }
 
-    public function isCompressionEnabled()
+    public function isCompressionEnabled(): bool
     {
         return $this->compression !== null;
     }
@@ -108,12 +108,17 @@ class Connection
         return $this->compression;
     }
 
-    public function writeText(string|Frame $frame)
+    public function writeText(string|Frame $frame): void
     {
         $this->write($frame, FrameTypeEnum::Text);
     }
 
-    public function onError($data)
+    public function writeBinary(string|Frame $frame): void
+    {
+        $this->write($frame, FrameTypeEnum::Binary);
+    }
+
+    public function onError($data): void
     {
         $message = "A connectivity error occurred: $data";
         $this->logger->error($message);
@@ -176,7 +181,7 @@ class Connection
             $errorMessage = json_encode(['error' => $th->getMessage()]);
 
             $this->messageWriter->write("HTTP/1.1 400 OK\r\nContent-Length: " .
-            strlen($errorMessage) . "\r\nConnection: close\r\n\r\n" .
+                strlen($errorMessage) . "\r\nConnection: close\r\n\r\n" .
                 $errorMessage);
 
             $this->logger->error(dump($th->getMessage()));
