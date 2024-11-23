@@ -6,7 +6,6 @@ use Kit\Websocket\Events\OnUpgradeEvent;
 use Kit\Websocket\Events\Protocols\Event;
 use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
 use Kit\Websocket\Http\RequestVerifier;
-use Kit\Websocket\Utilities\HandshakeResponder;
 use Kit\Websocket\Utilities\KeyDigest;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
@@ -14,18 +13,17 @@ use React\Promise\PromiseInterface;
 final readonly class OnUpgradeHandler implements PromiseListenerInterface
 {
     private RequestVerifier $requestVerifier;
-    private HandshakeResponder $handshakeResponder;
     private KeyDigest $keyDigest;
 
     public function __construct()
     {
         $this->requestVerifier = new RequestVerifier();
-        $this->handshakeResponder = new HandshakeResponder();
+
         $this->keyDigest = new KeyDigest();
     }
 
     /**
-     * @param \Kit\Websocket\Events\OnUpgradeEvent $event
+     * @param OnUpgradeEvent $event
      *
      * @return \React\Promise\PromiseInterface
      */
@@ -36,16 +34,14 @@ final readonly class OnUpgradeHandler implements PromiseListenerInterface
         return new Promise(
             resolver: function (callable $resolve, callable $reject) use ($request) {
                 $result = $this->requestVerifier->verify($request);
-                if (is_null($result)) {
+                if ($result === null) {
                     $secWebsocketKeyHeaders = $request->getHeader('sec-websocket-key');
                     if (count($secWebsocketKeyHeaders)) {
                         $secWebsocketKey = array_pop($secWebsocketKeyHeaders);
 
-                        $handshakeResponse = $this->handshakeResponder->prepareHandshakeResponse(
-                            acceptKey: $this->keyDigest->createSocketAcceptKey($secWebsocketKey)
-                        );
+                        $acceptKey = $this->keyDigest->createSocketAcceptKey($secWebsocketKey);
 
-                        return $resolve($handshakeResponse);
+                        return $resolve($acceptKey);
                     }
                 }
 

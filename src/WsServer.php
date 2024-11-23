@@ -15,25 +15,16 @@ use Kit\Websocket\Message\Protocols\ConnectionHandlerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\ServerInterface;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
 use Kit\Websocket\Connection\Connection;
 use SplObjectStorage;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class WsServer
 {
-    /**
-     * @var MessageHandlerInterface[]
-     */
-    private array $messageHandlers;
-
     private readonly SplObjectStorage $connections;
     private ServerInterface $server;
     private readonly EventDispatcherInterface $eventDispatcher;
@@ -136,30 +127,6 @@ class WsServer
         }
 
         $connection->getLogger()->info(sprintf('Ip "%s" left connection', $connection->getIp()));
-    }
-
-    private function getMessageHandler(UriInterface $uri)
-    {
-        $handler = null;
-
-        if (!empty($this->messageHandlers[$uri])) {
-            $handler = $this->messageHandlers[$uri];
-        }
-
-        if (null === $handler && !empty($this->messageHandlers['*'])) {
-            $handler = $this->messageHandlers['*'];
-        }
-
-        if (null !== $handler) {
-            if (\is_string($handler)) {
-                $handler = new $handler;
-            }
-
-            return $handler;
-        }
-
-        $this->logger->warning(sprintf('Connection on $s but no handler found.', $uri));
-        return null;
     }
 
     public function setConfig(Config|array $config): static

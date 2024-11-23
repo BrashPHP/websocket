@@ -4,29 +4,23 @@ declare(strict_types=1);
 
 namespace Kit\Websocket\Connection;
 
-use Kit\Websocket\Compression\CompressionDeflaterDetector;
 use Kit\Websocket\Compression\ServerCompressionContext;
 use Kit\Websocket\Connection\Exceptions\FailedWriteException;
 use Kit\Websocket\Events\OnDataReceivedEvent;
 use Kit\Websocket\Events\OnDisconnectEvent;
-use Kit\Websocket\Events\OnNewConnectionOpenEvent;
-use Kit\Websocket\Events\OnUpgradeEvent;
 use Kit\Websocket\Events\OnWebSocketExceptionEvent;
 use Kit\Websocket\Exceptions\WebSocketException;
 use Kit\Websocket\Frame\Enums\CloseFrameEnum;
 use Kit\Websocket\Frame\Enums\FrameTypeEnum;
 use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Http\RequestFactory;
 use Kit\Websocket\Message\MessageWriter;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 
 class Connection
 {
-    const int DEFAULT_TIMEOUT = 5; // in seconds
     private bool $handshakeDone = false;
     private ?ServerCompressionContext $compression = null;
 
@@ -108,6 +102,14 @@ class Connection
         return $this->compression;
     }
 
+    public function setCompression(?ServerCompressionContext $serverCompressionContext): void{
+        $this->compression = $serverCompressionContext;
+    }
+
+    public function completeHandshake(){
+        $this->handshakeDone = true;
+    }
+
     public function writeText(string|Frame $frame): void
     {
         $this->write($frame, FrameTypeEnum::Text);
@@ -139,55 +141,15 @@ class Connection
         return $this->handshakeDone;
     }
 
-    protected function handshake(string $data): void
-    {
-        $request = $this->tryCreateRequest($data);
-        if ($request) {
-            $this->eventDispatcher->dispatch(new OnUpgradeEvent(
-                $request
-            ))
-                ->then(function (string $handshakeResponse): void {
-                    if ($this->isCompressionEnabled()) {
-                        $handshakeResponse = $this->compression->attachToStringResponse($handshakeResponse);
-                    }
-                    $this->logger->debug("Handshake: $handshakeResponse");
-                    $this->messageWriter->write($handshakeResponse);
-                    $this->handshakeDone = true;
-                    $this->eventDispatcher->dispatch(new OnNewConnectionOpenEvent($this));
-                })
-                ->catch(function (WebSocketException $webSocketException): void {
-                    $this->messageWriter->close(CloseFrameEnum::CLOSE_NORMAL);
-                    $this->logger->notice('Connection to ' . $this->ip . ' closed with error : ' . $webSocketException->getMessage());
-                    $this->eventDispatcher->dispatch(new OnWebSocketExceptionEvent($webSocketException, $this));
-                });
-        }
-    }
-
     protected function processMessage(string $data): void
     {
-        $this->logger->debug("Received data");
         $this->eventDispatcher->dispatch(new OnDataReceivedEvent($data, $this));
     }
 
-    private function tryCreateRequest(string $data): ?RequestInterface
-    {
-        try {
-            $request = RequestFactory::createRequest($data);
-            $compressionDetector = new CompressionDeflaterDetector();
-            $this->compression = $compressionDetector->detect($request);
+    protected function handshake(string $data): void{
+        $handshaker = new ConnectionHandshake($this);
 
-            return $request;
-        } catch (\Throwable $th) {
-            $errorMessage = json_encode(['error' => $th->getMessage()]);
-
-            $this->messageWriter->write("HTTP/1.1 400 OK\r\nContent-Length: " .
-                strlen($errorMessage) . "\r\nConnection: close\r\n\r\n" .
-                $errorMessage);
-
-            $this->logger->error(dump($th->getMessage()));
-
-            return null;
-        }
+        $handshaker->handshake($data);
     }
 }
 

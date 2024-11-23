@@ -44,14 +44,6 @@ class RequestFactory
 
         $request = $request->withMethod($httpElements[0])->withUri(new Uri($httpElements[1]));
 
-        if (
-            empty($request->hasHeader('Sec-WebSocket-Key')) ||
-            empty($request->hasHeader('Upgrade')) ||
-            \strtolower($request->getHeader('upgrade')[0]) !== 'websocket'
-        ) {
-            throw new BadUpgradeException($requestString);
-        }
-
         return $request;
     }
 }

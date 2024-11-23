@@ -6,8 +6,6 @@ namespace Kit\Websocket\Connection;
 
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
-use React\Promise\Deferred;
-use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
 class TimeoutHandler
