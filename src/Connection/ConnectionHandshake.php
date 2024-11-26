@@ -186,9 +186,10 @@ final readonly class ConnectionHandshake
      */
     private function sendErrorResponse(string $errorMessage): void
     {
+        $errorMessage = json_encode(['error' => $errorMessage]);
         $response = "HTTP/1.1 400 Bad Request\r\nContent-Length: " .
             strlen($errorMessage) . "\r\nConnection: close\r\n\r\n" .
-            json_encode(['error' => $errorMessage]);
+            $errorMessage;
 
         $this->connection->getSocketWriter()->write($response);
         $this->connection->getLogger()->error($errorMessage);
