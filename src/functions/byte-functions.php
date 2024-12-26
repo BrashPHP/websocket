@@ -1,9 +1,9 @@
 <?php
 
-namespace Kit\Websocket\functions;
+namespace Brash\Websocket\functions;
 
-use Kit\Websocket\Frame\DataManipulation\Exceptions\InvalidBitException;
-use Kit\Websocket\Frame\DataManipulation\Exceptions\InvalidByteException;
+use Brash\Websocket\Frame\DataManipulation\Exceptions\InvalidBitException;
+use Brash\Websocket\Frame\DataManipulation\Exceptions\InvalidByteException;
 
 if (!function_exists('validateByte')) {
     function validateByte(int $byte)

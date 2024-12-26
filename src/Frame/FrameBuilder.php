@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame;
+namespace Brash\Websocket\Frame;
 
-use Kit\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
-use Kit\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
-use Kit\Websocket\Frame\DataManipulation\Functions\GetInfoBytesLengthFunction;
-use Kit\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
-use function Kit\Websocket\functions\frameSize;
-use function Kit\Websocket\functions\intToBinaryString;
-use function Kit\Websocket\functions\nthBitFromByte;
+use Brash\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
+use Brash\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
+use Brash\Websocket\Frame\DataManipulation\Functions\GetInfoBytesLengthFunction;
+use Brash\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Enums\InspectionFrameEnum;
+use function Brash\Websocket\functions\frameSize;
+use function Brash\Websocket\functions\intToBinaryString;
+use function Brash\Websocket\functions\nthBitFromByte;
 
 
 final class FrameBuilder
@@ -82,11 +82,11 @@ final class FrameBuilder
     /**
      * Generates a payload from the raw frame.
      *
-     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\NotLongEnoughException if the string frame is shorter than expected.
-     * @throws \Kit\Websocket\Frame\Exceptions\InvalidNegativeNumberFrameException if the integer frame is negative.
-     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\InvalidRangeException
-     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\BadByteSizeRequestedException
-     * @throws \Kit\Websocket\Frame\DataManipulation\Exceptions\PhpByteLimitationException
+     * @throws \Brash\Websocket\Frame\DataManipulation\Exceptions\NotLongEnoughException if the string frame is shorter than expected.
+     * @throws \Brash\Websocket\Frame\Exceptions\InvalidNegativeNumberFrameException if the integer frame is negative.
+     * @throws \Brash\Websocket\Frame\DataManipulation\Exceptions\InvalidRangeException
+     * @throws \Brash\Websocket\Frame\DataManipulation\Exceptions\BadByteSizeRequestedException
+     * @throws \Brash\Websocket\Frame\DataManipulation\Exceptions\PhpByteLimitationException
      */
     public function processPayload(string $rawData, PayloadLengthDto $payloadLengthDto): FramePayload
     {

@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Kit\Websocket\Config;
+namespace Brash\Websocket\Config;
 
-use Kit\Websocket\Config\Exceptions\XdebugEnabledException;
+use Brash\Websocket\Config\Exceptions\XdebugEnabledException;
 
 final readonly class Config
 {

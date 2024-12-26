@@ -1,7 +1,7 @@
 <?php
 
 namespace Tests\Datasets;
-use function Kit\Websocket\functions\hexArrayToString;
+use function Brash\Websocket\functions\hexArrayToString;
 
 $invalidArgumentExceptionClass = '\InvalidArgumentException';
 

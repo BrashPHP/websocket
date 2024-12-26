@@ -1,17 +1,17 @@
 <?php
 
-namespace Kit\Websocket\Connection;
+namespace Brash\Websocket\Connection;
 
-use Kit\Websocket\Compression\CompressionDeflaterDetector;
-use Kit\Websocket\Events\OnNewConnectionOpenEvent;
-use Kit\Websocket\Events\OnUpgradeEvent;
-use Kit\Websocket\Events\OnWebSocketExceptionEvent;
-use Kit\Websocket\Exceptions\WebSocketException;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Http\Exceptions\BadUpgradeException;
-use Kit\Websocket\Http\RequestFactory;
-use Kit\Websocket\Http\Response;
-use Kit\Websocket\Utilities\HandshakeResponder;
+use Brash\Websocket\Compression\CompressionDeflaterDetector;
+use Brash\Websocket\Events\OnNewConnectionOpenEvent;
+use Brash\Websocket\Events\OnUpgradeEvent;
+use Brash\Websocket\Events\OnWebSocketExceptionEvent;
+use Brash\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Http\Exceptions\BadUpgradeException;
+use Brash\Websocket\Http\RequestFactory;
+use Brash\Websocket\Http\Response;
+use Brash\Websocket\Utilities\HandshakeResponder;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use React\Promise\PromiseInterface;

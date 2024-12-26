@@ -1,12 +1,12 @@
 <?php
 
-namespace Kit\Websocket\Message\Orchestration;
-use Kit\Websocket\Exceptions\IncoherentDataException;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;
-use Kit\Websocket\Frame\Exceptions\ProtocolErrorException;
-use Kit\Websocket\Message\Exceptions\LimitationException;
-use Kit\Websocket\Message\Message;
+namespace Brash\Websocket\Message\Orchestration;
+use Brash\Websocket\Exceptions\IncoherentDataException;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\Exceptions\IncompleteFrameException;
+use Brash\Websocket\Frame\Exceptions\ProtocolErrorException;
+use Brash\Websocket\Message\Exceptions\LimitationException;
+use Brash\Websocket\Message\Message;
 
 final readonly class OrchestrationResponse
 {

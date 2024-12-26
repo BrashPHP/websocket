@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Frame;
 
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
 
 test('Should check if enum of type text is operation', fn() => expect((FrameTypeEnum::Text)->isOperation())->toBeTrue());
 test('Should check if enum of type binary is operation', fn() => expect((FrameTypeEnum::Binary)->isOperation())->toBeTrue());

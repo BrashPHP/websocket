@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\DataManipulation\Functions;
+namespace Brash\Websocket\Frame\DataManipulation\Functions;
 
-use function Kit\Websocket\functions\frameSize;
+use function Brash\Websocket\functions\frameSize;
 
 final class GetNthByteFunction
 {

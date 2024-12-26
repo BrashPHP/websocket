@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame;
-use Kit\Websocket\Frame\DataManipulation\Functions\GetInfoBytesLengthFunction;
+namespace Brash\Websocket\Frame;
+use Brash\Websocket\Frame\DataManipulation\Functions\GetInfoBytesLengthFunction;
 
 /**
  * Frame Payload operations are contained within this class to provide granular acess to data functions and operations.

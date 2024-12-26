@@ -1,6 +1,6 @@
 <?php
 
-use Kit\Websocket\Utilities\HandshakeResponder;
+use Brash\Websocket\Utilities\HandshakeResponder;
 
 
 test('should return a valid handshake response ', function (): void {

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Message;
 
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Handlers\PingFrameHandler;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageFactory;
-use Kit\Websocket\Message\MessageProcessor;
-use Kit\Websocket\Message\MessageWriter;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Handlers\PingFrameHandler;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\MessageFactory;
+use Brash\Websocket\Message\MessageProcessor;
+use Brash\Websocket\Message\MessageWriter;
 use Mockery\MockInterface;
 use React\Socket\ConnectionInterface;
-use function Kit\Websocket\functions\hexArrayToString;
+use function Brash\Websocket\functions\hexArrayToString;
 use function Tests\Helpers\createMessageWriter;
 
 function createMockConnection(): MockInterface|ConnectionInterface

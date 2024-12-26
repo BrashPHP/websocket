@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message\Protocols;
+namespace Brash\Websocket\Message\Protocols;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Message\Message;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Message\Message;
 
 interface MessageHandlerInterface
 {

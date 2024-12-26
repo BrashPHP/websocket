@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Message\Handlers;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Handlers\CloseFrameHandler;
-use Kit\Websocket\Message\Message;
-use function Kit\Websocket\functions\hexArrayToString;
-use function Kit\Websocket\functions\intToBinaryString;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Handlers\CloseFrameHandler;
+use Brash\Websocket\Message\Message;
+use function Brash\Websocket\functions\hexArrayToString;
+use function Brash\Websocket\functions\intToBinaryString;
 use function Tests\Unit\Connection\createConnectionObject;
 
 function createSut(): CloseFrameHandler

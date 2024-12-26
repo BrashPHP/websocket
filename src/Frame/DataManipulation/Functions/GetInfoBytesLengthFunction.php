@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Frame\DataManipulation\Functions;
+namespace Brash\Websocket\Frame\DataManipulation\Functions;
 
 final class GetInfoBytesLengthFunction
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Kit\Websocket\Message\Protocols;
+namespace Brash\Websocket\Message\Protocols;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Exceptions\WebSocketException;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Message\Message;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Message\Message;
 
 abstract class AbstractTextMessageHandler implements ConnectionHandlerInterface
 {

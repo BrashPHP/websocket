@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Http\Exceptions;
+namespace Brash\Websocket\Http\Exceptions;
 
 
 class NoHttpException extends \Exception

@@ -1,8 +1,6 @@
 <?php
 
-use Kit\Websocket\Server;
 use React\EventLoop\Loop;
-use React\Socket\SocketServer;
 use Revolt\EventLoop\React\Internal\EventLoopAdapter;
 
 require_once "vendor/autoload.php";

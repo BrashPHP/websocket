@@ -1,10 +1,10 @@
 <?php
 namespace Tests\Unit\Frame;
-use Kit\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
+use Brash\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
 
-use Kit\Websocket\Frame\FrameBuilder;
-use Kit\Websocket\Frame\PayloadLengthCalculator;
-use Kit\Websocket\Frame\PayloadLengthDto;
+use Brash\Websocket\Frame\FrameBuilder;
+use Brash\Websocket\Frame\PayloadLengthCalculator;
+use Brash\Websocket\Frame\PayloadLengthDto;
 
 
 function createSut(): FrameBuilder

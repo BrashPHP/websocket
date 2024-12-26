@@ -2,12 +2,12 @@
 
 
 namespace Tests\Unit\Message;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageBus;
-use Kit\Websocket\Message\Orchestration\MessageOrchestrator;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\MessageBus;
+use Brash\Websocket\Message\Orchestration\MessageOrchestrator;
 
-use function Kit\Websocket\functions\hexArrayToString;
+use function Brash\Websocket\functions\hexArrayToString;
 
 test('Should build message correctly', function (): void  {
     $processor = new MessageOrchestrator(new FrameFactory());

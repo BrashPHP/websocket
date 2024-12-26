@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Helpers;
 
 use Evenement\EventEmitterTrait;
-use Kit\Websocket\Connection\TimeoutHandler;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageProcessor;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
+use Brash\Websocket\Connection\TimeoutHandler;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\MessageProcessor;
+use Brash\Websocket\Message\Protocols\MessageHandlerInterface;
 use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
 use React\Socket\ConnectionInterface;

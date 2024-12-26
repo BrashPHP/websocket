@@ -1,9 +1,9 @@
 <?php
 
-namespace Kit\Websocket\Connection\Events;
+namespace Brash\Websocket\Connection\Events;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Exceptions\WebSocketException;
 
 interface OnConnectionErrorInterface
 {

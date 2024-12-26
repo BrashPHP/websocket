@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Connection;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Events\OnDataReceivedEvent;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Handlers\OnDataReceivedHandler;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
-use function Kit\Websocket\functions\hexArrayToString;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Events\OnDataReceivedEvent;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Handlers\OnDataReceivedHandler;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\Protocols\MessageHandlerInterface;
+use function Brash\Websocket\functions\hexArrayToString;
 use function Tests\Helpers\createMessageProcessor;
 use function Tests\Helpers\createTimeoutHandler;
 use function Tests\Helpers\mockMessage;

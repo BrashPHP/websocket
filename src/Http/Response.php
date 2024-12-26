@@ -5,9 +5,9 @@
  * This file is part of Websocket PHP and is free software under the ISC License.
  */
 
-namespace Kit\Websocket\Http;
+namespace Brash\Websocket\Http;
 
-use Kit\Websocket\Http\HttpMessage;
+use Brash\Websocket\Http\HttpMessage;
 
 use Psr\Http\Message\{
     ResponseInterface

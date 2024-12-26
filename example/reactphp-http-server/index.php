@@ -1,24 +1,5 @@
 <?php
 
-/*
-Here's the gist to get you started:
-
-$ telnet localhost 1080
-> GET / HTTP/1.1
-> Upgrade: chat
->
-< HTTP/1.1 101 Switching Protocols
-< Upgrade: chat
-< Connection: upgrade
-<
-> hello
-< user123: hello
-> world
-< user123: world
-
-Hint: try this with multiple connections :)
-*/
-
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\Loop;
 use React\Http\Message\Response;
@@ -35,7 +16,7 @@ $chat = new ThroughStream();
 // Note how this example uses the `HttpServer` without the `StreamingRequestMiddleware`.
 // The initial incoming request does not contain a body and we upgrade to a
 // stream object below.
-$http = new React\Http\HttpServer(function (ServerRequestInterface $request) use ($chat) {
+$http = new React\Http\HttpServer(function (ServerRequestInterface $request) use ($chat): Response {
     if ($request->getHeaderLine('Upgrade') !== 'chat' || $request->getProtocolVersion() === '1.0') {
         return new Response(
             Response::STATUS_UPGRADE_REQUIRED,

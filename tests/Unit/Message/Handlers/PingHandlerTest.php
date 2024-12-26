@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Message\Handlers;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Handlers\PingFrameHandler;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageWriter;
-use function Kit\Websocket\functions\hexArrayToString;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Handlers\PingFrameHandler;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\MessageWriter;
+use function Brash\Websocket\functions\hexArrayToString;
 
 
 test('Should process close frame', function (): void {

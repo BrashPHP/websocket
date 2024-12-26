@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Compression;
+namespace Brash\Websocket\Compression;
 
 final readonly class CompressionConf
 {

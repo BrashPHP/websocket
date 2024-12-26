@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Http;
+namespace Brash\Websocket\Http;
 use Psr\Http\Message\RequestInterface;
 
 final class RequestStringfy

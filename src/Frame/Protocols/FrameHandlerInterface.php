@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\Protocols;
+namespace Brash\Websocket\Frame\Protocols;
 
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageWriter;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\MessageWriter;
 
 interface FrameHandlerInterface
 {

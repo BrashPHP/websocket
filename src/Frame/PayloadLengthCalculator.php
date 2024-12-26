@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame;
+namespace Brash\Websocket\Frame;
 
 /**
  *

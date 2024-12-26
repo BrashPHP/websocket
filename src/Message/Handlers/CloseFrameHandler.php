@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message\Handlers;
+namespace Brash\Websocket\Message\Handlers;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
-use function Kit\Websocket\functions\frameSize;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\Protocols\MessageHandlerInterface;
+use function Brash\Websocket\functions\frameSize;
 
 class CloseFrameHandler implements MessageHandlerInterface
 {

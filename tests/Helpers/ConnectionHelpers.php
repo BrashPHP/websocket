@@ -2,8 +2,8 @@
 
 namespace Tests\Helpers;
 
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\MessageWriter;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\MessageWriter;
 use React\Socket\ConnectionInterface;
 use Mockery\MockInterface;
 

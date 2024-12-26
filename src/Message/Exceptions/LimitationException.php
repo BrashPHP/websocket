@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message\Exceptions;
+namespace Brash\Websocket\Message\Exceptions;
 
-use Kit\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Exceptions\WebSocketException;
 
 class LimitationException extends WebSocketException
 {

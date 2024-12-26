@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message\Orchestration;
+namespace Brash\Websocket\Message\Orchestration;
 
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageBus;
-use Kit\Websocket\Message\Validation\AbstractMessageValidator;
-use Kit\Websocket\Message\Validation\CanIncludeFrame;
-use Kit\Websocket\Message\Validation\ValidateFrame;
-use Kit\Websocket\Message\Validation\ValidateOpCode;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\MessageBus;
+use Brash\Websocket\Message\Validation\AbstractMessageValidator;
+use Brash\Websocket\Message\Validation\CanIncludeFrame;
+use Brash\Websocket\Message\Validation\ValidateFrame;
+use Brash\Websocket\Message\Validation\ValidateOpCode;
 
-use function Kit\Websocket\functions\removeStart;
+use function Brash\Websocket\functions\removeStart;
 
 final class MessageOrchestrator
 {

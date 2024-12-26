@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame;
+namespace Brash\Websocket\Frame;
 
-use Kit\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
+use Brash\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Enums\InspectionFrameEnum;
 
-use function Kit\Websocket\functions\frameSize;
-use function Kit\Websocket\functions\intToBinaryString;
+use function Brash\Websocket\functions\frameSize;
+use function Brash\Websocket\functions\intToBinaryString;
 
 class Frame
 {

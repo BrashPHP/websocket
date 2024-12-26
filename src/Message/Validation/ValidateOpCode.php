@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message\Validation;
+namespace Brash\Websocket\Message\Validation;
 
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Frame\FrameValidation\ValidationUponOpCode;
-use Kit\Websocket\Message\Message;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Frame\FrameValidation\ValidationUponOpCode;
+use Brash\Websocket\Message\Message;
 
 final class ValidateOpCode extends AbstractMessageValidator
 {

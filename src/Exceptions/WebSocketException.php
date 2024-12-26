@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Exceptions;
+namespace Brash\Websocket\Exceptions;
 
 
 class WebSocketException extends \Exception

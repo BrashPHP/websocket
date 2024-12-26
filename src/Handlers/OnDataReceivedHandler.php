@@ -1,21 +1,21 @@
 <?php
 
-namespace Kit\Websocket\Handlers;
+namespace Brash\Websocket\Handlers;
 
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Connection\TimeoutHandler;
-use Kit\Websocket\Events\Protocols\Event;
-use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Connection\TimeoutHandler;
+use Brash\Websocket\Events\Protocols\Event;
+use Brash\Websocket\Events\Protocols\PromiseListenerInterface;
 
-use Kit\Websocket\Message\Handlers\MessageDeflateProxyHandler;
-use Kit\Websocket\Message\Handlers\MessageDeflaterHandler;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\MessageProcessor;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
+use Brash\Websocket\Message\Handlers\MessageDeflateProxyHandler;
+use Brash\Websocket\Message\Handlers\MessageDeflaterHandler;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\MessageProcessor;
+use Brash\Websocket\Message\Protocols\MessageHandlerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use Kit\Websocket\Events\OnDataReceivedEvent;
+use Brash\Websocket\Events\OnDataReceivedEvent;
 
 /**
  * @template-implements PromiseListenerInterface<OnDataReceivedEvent,Connection>

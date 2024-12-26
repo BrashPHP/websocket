@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Utilities;
+namespace Brash\Websocket\Utilities;
 
 final class HandshakeResponder
 {

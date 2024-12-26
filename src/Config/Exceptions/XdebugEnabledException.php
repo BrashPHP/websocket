@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Config\Exceptions;
+namespace Brash\Websocket\Config\Exceptions;
 
 final class XdebugEnabledException extends \Exception
 {

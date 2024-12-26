@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket;
+namespace Brash\Websocket;
 
 class MessageHandler
 {
@@ -12,7 +12,7 @@ class MessageHandler
     public function __construct()
     {
         $isRunning = $this->isRunning;
-        $this->fiber = new \Fiber(function () use ($isRunning): void{
+        $this->fiber = new \Fiber(function () use ($isRunning): void {
             while ($isRunning) {
                 $this->checkForUpdate();
                 \Fiber::suspend();
@@ -20,7 +20,8 @@ class MessageHandler
         });
     }
 
-    public function closeHandler(){
+    public function closeHandler()
+    {
         $this->isRunning = false;
         $this->fiber->getReturn();
     }

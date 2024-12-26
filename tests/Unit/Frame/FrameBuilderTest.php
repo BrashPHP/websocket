@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Frame;
 
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Frame\PayloadLengthDto;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Frame\PayloadLengthDto;
 
 $sut = new FrameFactory();
 

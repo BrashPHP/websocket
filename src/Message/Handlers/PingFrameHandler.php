@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message\Handlers;
+namespace Brash\Websocket\Message\Handlers;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\Protocols\MessageHandlerInterface;
 
 class PingFrameHandler implements MessageHandlerInterface
 {

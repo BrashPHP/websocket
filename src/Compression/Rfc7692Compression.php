@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Compression;
+namespace Brash\Websocket\Compression;
 
-use Kit\Websocket\Compression\CompressionConf;
-use Kit\Websocket\Compression\Exceptions\BadCompressionException;
-use function Kit\Websocket\functions\frameSize;
+use Brash\Websocket\Compression\CompressionConf;
+use Brash\Websocket\Compression\Exceptions\BadCompressionException;
+use function Brash\Websocket\functions\frameSize;
 
 final readonly class Rfc7692Compression
 {

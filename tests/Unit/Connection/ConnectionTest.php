@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Connection;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Events\OnDataReceivedEvent;
-use Kit\Websocket\Events\OnDisconnectEvent;
-use Kit\Websocket\Events\OnNewConnectionOpenEvent;
-use Kit\Websocket\Events\OnUpgradeEvent;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Message\MessageWriter;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Events\OnDataReceivedEvent;
+use Brash\Websocket\Events\OnDisconnectEvent;
+use Brash\Websocket\Events\OnNewConnectionOpenEvent;
+use Brash\Websocket\Events\OnUpgradeEvent;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Message\MessageWriter;
 use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;

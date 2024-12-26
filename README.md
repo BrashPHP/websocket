@@ -24,6 +24,12 @@ Build your application using small, reusable and atomic components if you want o
 
 This library is server-side only. I did not have interest in implementing client code, but feel free to do it if you are into that.
 
+## Install
+
+```bash
+composer require brash/websocket
+```
+
 ## How to
 
 Quick start:
@@ -32,10 +38,10 @@ Quick start:
 
 require_once 'vendor/autoload.php';
 
-$server = new \Kit\Websocket\WsServer(host: '0.0.0.0', port: 1337);
+$server = new \Brash\Websocket\WsServer(host: '0.0.0.0', port: 1337);
 
 $server->setConnectionHandler(
-    connectionHandlerInterface: new class extends \Kit\Websocket\Message\Protocols\AbstractTextMessageHandler {
+    connectionHandlerInterface: new class extends \Brash\Websocket\Message\Protocols\AbstractTextMessageHandler {
 
     private array $connections;
 
@@ -45,12 +51,12 @@ $server->setConnectionHandler(
     }
 
     // Optional, as with on onDisconnect, onError
-    public function onOpen(\Kit\Websocket\Connection\Connection $connection): void
+    public function onOpen(\Brash\Websocket\Connection\Connection $connection): void
     {
         $this->connections[] = $connection;
     }
 
-    public function handleTextData(string $data, \Kit\Websocket\Connection\Connection $connection): void
+    public function handleTextData(string $data, \Brash\Websocket\Connection\Connection $connection): void
     {
         $connection->getLogger()->debug("IP" . ":" . $connection->getIp() . PHP_EOL);
         $connection->getLogger()->debug("Data: " . $data . PHP_EOL);
@@ -88,19 +94,19 @@ $configArray = [
     'sslContextOptions' => [],
 ];
 
-$config = \Kit\Websocket\Config\Config::createFromArray($configArray);
+$config = \Brash\Websocket\Config\Config::createFromArray($configArray);
 
 // OR
-$config = new \Kit\Websocket\Config\Config(
+$config = new \Brash\Websocket\Config\Config(
     // DEFAULTS: int $timeout = self::MESSAGE_TIMEOUT_IN_SECONDS,
     // DEFAULTS: int $maxPayloadSize = self::MAX_PAYLOAD_SIZE,
     // DEFAULTS: int $maxMessagesBuffering = self::MAX_MESSAGES_BUFFERING,
     // DEFAULTS: bool $writeMasked = false,
     // DEFAULTS: bool $prod = true,
-    // DEFAULTS: ?\Kit\Websocket\Config\SslConfig $sslConfig = null
+    // DEFAULTS: ?\Brash\Websocket\Config\SslConfig $sslConfig = null
 );
 
-$server = new \Kit\Websocket\WsServer(host: '0.0.0.0', port: 1337, $config);
+$server = new \Brash\Websocket\WsServer(host: '0.0.0.0', port: 1337, $config);
 
 ```
 
@@ -122,7 +128,7 @@ supports wss out of the box, you just need to add the related options (`ssl` and
 You should instanciate woketo like this:
 
 ```php
-$server = new \Kit\Websocket\WsServer(9001, '127.0.0.1',
+$server = new \Brash\Websocket\WsServer(9001, '127.0.0.1',
     new Config(
         ...[
             'ssl' => true,

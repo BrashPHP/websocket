@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Http\Exceptions;
+namespace Brash\Websocket\Http\Exceptions;
 
 final class BadUpgradeException extends \Exception
 {

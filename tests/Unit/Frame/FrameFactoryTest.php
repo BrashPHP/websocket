@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Frame;
 
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Message;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Message;
 
-use function Kit\Websocket\functions\hexArrayToString;
+use function Brash\Websocket\functions\hexArrayToString;
 
 test('Should create close frame', function (): void {
     $factory = new FrameFactory();

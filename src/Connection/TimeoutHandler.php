@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Connection;
+namespace Brash\Websocket\Connection;
 
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Kit\Websocket\Message\Validation;
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Message\Message;
+namespace Brash\Websocket\Message\Validation;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Message\Message;
 
 
 abstract class AbstractMessageValidator implements ValidationChainInterface

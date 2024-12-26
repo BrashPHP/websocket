@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\DataManipulation\Functions;
+namespace Brash\Websocket\Frame\DataManipulation\Functions;
 
-use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
+use Brash\Websocket\Frame\Enums\InspectionFrameEnum;
 
 final class BytesFromToStringFunction
 {

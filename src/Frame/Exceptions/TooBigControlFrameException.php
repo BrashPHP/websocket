@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\Exceptions;
+namespace Brash\Websocket\Frame\Exceptions;
 
 class TooBigControlFrameException extends ProtocolErrorException
 {

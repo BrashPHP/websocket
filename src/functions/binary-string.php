@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\functions;
+namespace Brash\Websocket\functions;
 
 
 if (!function_exists('getBytes')) {

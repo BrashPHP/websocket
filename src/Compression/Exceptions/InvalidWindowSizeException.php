@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Compression\Exceptions;
+namespace Brash\Websocket\Compression\Exceptions;
 
 class InvalidWindowSizeException extends \RuntimeException
 {

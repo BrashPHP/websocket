@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket;
+namespace Brash\Websocket;
 
 
 

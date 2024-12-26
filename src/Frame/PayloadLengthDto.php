@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame;
-use Kit\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
+namespace Brash\Websocket\Frame;
+use Brash\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
 
 readonly class PayloadLengthDto
 {

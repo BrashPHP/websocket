@@ -1,9 +1,9 @@
 <?php
 
-namespace Kit\Websocket\Frame;
+namespace Brash\Websocket\Frame;
 
-use function Kit\Websocket\functions\nthBitFromByte;
-use function Kit\Websocket\functions\validateByte;
+use function Brash\Websocket\functions\nthBitFromByte;
+use function Brash\Websocket\functions\validateByte;
 
 final readonly class FrameMetadata
 {

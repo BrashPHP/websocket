@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Connection;
+namespace Brash\Websocket\Connection;
 
-use Kit\Websocket\Events\Protocols\Event;
-use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
+use Brash\Websocket\Events\Protocols\Event;
+use Brash\Websocket\Events\Protocols\PromiseListenerInterface;
 use React\Promise\PromiseInterface;
 
 
@@ -17,7 +17,7 @@ final readonly class DataHandlerAdapter implements PromiseListenerInterface
     }
 
     /**
-     * @param \Kit\Websocket\Events\OnDataReceivedEvent $subject
+     * @param \Brash\Websocket\Events\OnDataReceivedEvent $subject
      *
      * @return PromiseInterface<Connection>
      */

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame;
+namespace Brash\Websocket\Frame;
 
-use Kit\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
-use Kit\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Enums\InspectionFrameEnum;
-use Kit\Websocket\Frame\Exceptions\IncompleteFrameException;
-use Kit\Websocket\Frame\FrameBuilder;
+use Brash\Websocket\Frame\DataManipulation\Functions\BytesFromToStringFunction;
+use Brash\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Enums\InspectionFrameEnum;
+use Brash\Websocket\Frame\Exceptions\IncompleteFrameException;
+use Brash\Websocket\Frame\FrameBuilder;
 
-use Kit\Websocket\Message\Exceptions\LimitationException;
-use function Kit\Websocket\functions\frameSize;
-use function Kit\Websocket\functions\intToBinaryString;
+use Brash\Websocket\Message\Exceptions\LimitationException;
+use function Brash\Websocket\functions\frameSize;
+use function Brash\Websocket\functions\intToBinaryString;
 
 /**
  * Class FrameFactory

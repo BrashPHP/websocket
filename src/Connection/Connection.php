@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Connection;
+namespace Brash\Websocket\Connection;
 
-use Kit\Websocket\Compression\ServerCompressionContext;
-use Kit\Websocket\Connection\Exceptions\FailedWriteException;
-use Kit\Websocket\Events\OnDataReceivedEvent;
-use Kit\Websocket\Events\OnDisconnectEvent;
-use Kit\Websocket\Events\OnWebSocketExceptionEvent;
-use Kit\Websocket\Exceptions\WebSocketException;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Message\MessageWriter;
+use Brash\Websocket\Compression\ServerCompressionContext;
+use Brash\Websocket\Connection\Exceptions\FailedWriteException;
+use Brash\Websocket\Events\OnDataReceivedEvent;
+use Brash\Websocket\Events\OnDisconnectEvent;
+use Brash\Websocket\Events\OnWebSocketExceptionEvent;
+use Brash\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Message\MessageWriter;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

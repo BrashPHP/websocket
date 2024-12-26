@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Frame\DataManipulation\Exceptions;
+namespace Brash\Websocket\Frame\DataManipulation\Exceptions;
 
 final class InvalidBitException extends \InvalidArgumentException
 {

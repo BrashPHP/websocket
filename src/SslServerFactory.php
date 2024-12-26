@@ -1,8 +1,8 @@
 <?php
 
-namespace Kit\Websocket;
+namespace Brash\Websocket;
 
-use Kit\Websocket\Config\SslConfig;
+use Brash\Websocket\Config\SslConfig;
 use React\EventLoop\LoopInterface;
 use React\Socket\SecureServer;
 use React\Socket\ServerInterface;

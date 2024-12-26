@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket;
+namespace Brash\Websocket;
 
-use Kit\Websocket\Config\Config;
-use Kit\Websocket\Connection\DataHandlerFactory;
-use Kit\Websocket\Connection\EventSubscriber;
-use Kit\Websocket\Events\Protocols\ListenerProvider;
-use Kit\Websocket\Events\Protocols\PromiseEventDispatcher;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\MessageWriter;
-use Kit\Websocket\Message\Protocols\ConnectionHandlerInterface;
+use Brash\Websocket\Config\Config;
+use Brash\Websocket\Connection\DataHandlerFactory;
+use Brash\Websocket\Connection\EventSubscriber;
+use Brash\Websocket\Events\Protocols\ListenerProvider;
+use Brash\Websocket\Events\Protocols\PromiseEventDispatcher;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\MessageWriter;
+use Brash\Websocket\Message\Protocols\ConnectionHandlerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -20,7 +20,7 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\ServerInterface;
-use Kit\Websocket\Connection\Connection;
+use Brash\Websocket\Connection\Connection;
 use SplObjectStorage;
 
 class WsServer

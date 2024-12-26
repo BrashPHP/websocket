@@ -1,12 +1,12 @@
 <?php
 
-namespace Kit\Websocket\Handlers;
+namespace Brash\Websocket\Handlers;
 
-use Kit\Websocket\Events\OnUpgradeEvent;
-use Kit\Websocket\Events\Protocols\Event;
-use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
-use Kit\Websocket\Http\RequestVerifier;
-use Kit\Websocket\Utilities\KeyDigest;
+use Brash\Websocket\Events\OnUpgradeEvent;
+use Brash\Websocket\Events\Protocols\Event;
+use Brash\Websocket\Events\Protocols\PromiseListenerInterface;
+use Brash\Websocket\Http\RequestVerifier;
+use Brash\Websocket\Utilities\KeyDigest;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 

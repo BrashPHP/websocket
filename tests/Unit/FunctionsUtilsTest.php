@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use function Kit\Websocket\functions\getBytes;
+use function Brash\Websocket\functions\getBytes;
 
 test('Should receive converted byte string array', function (): void {
     $result = getBytes('this is a test');

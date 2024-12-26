@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Frame\DataManipulation;
 
-use Kit\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
-use Kit\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
+use Brash\Websocket\Frame\DataManipulation\Functions\ByteSequenceFunction;
+use Brash\Websocket\Frame\DataManipulation\Functions\GetNthByteFunction;
 
 
 test("Should retrive subframes", function ($frame, $from, $to, $force8bytes = false, $res = null): void {

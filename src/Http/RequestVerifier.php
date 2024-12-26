@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Http;
+namespace Brash\Websocket\Http;
 
-use Kit\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Exceptions\WebSocketException;
 use Psr\Http\Message\RequestInterface;
 
 final class RequestVerifier

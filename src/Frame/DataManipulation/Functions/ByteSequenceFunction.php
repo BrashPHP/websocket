@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\DataManipulation\Functions;
+namespace Brash\Websocket\Frame\DataManipulation\Functions;
 
-use Kit\Websocket\Frame\DataManipulation\Exceptions\{
+use Brash\Websocket\Frame\DataManipulation\Exceptions\{
     BadByteSizeRequestedException,
     InvalidRangeException,
     NotLongEnoughException,
     PhpByteLimitationException,
 };
-use Kit\Websocket\Frame\Exceptions\InvalidNegativeNumberFrameException;
+use Brash\Websocket\Frame\Exceptions\InvalidNegativeNumberFrameException;
 
 final class ByteSequenceFunction
 {

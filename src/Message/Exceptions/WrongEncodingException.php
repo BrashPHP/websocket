@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message\Exceptions;
+namespace Brash\Websocket\Message\Exceptions;
 
-use Kit\Websocket\Exceptions\IncoherentDataException;
+use Brash\Websocket\Exceptions\IncoherentDataException;
 
 
 class WrongEncodingException extends IncoherentDataException

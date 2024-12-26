@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\FrameValidation;
+namespace Brash\Websocket\Frame\FrameValidation;
 
-use Kit\Websocket\Frame\Exceptions\ProtocolErrorException;
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Frame\Protocols\FrameOpcodeValidatorInterface;
+use Brash\Websocket\Frame\Exceptions\ProtocolErrorException;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Frame\Protocols\FrameOpcodeValidatorInterface;
 
 final class CloseFrameValidation implements FrameOpcodeValidatorInterface
 {

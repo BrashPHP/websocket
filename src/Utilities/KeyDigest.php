@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Utilities;
+namespace Brash\Websocket\Utilities;
 
 use function sha1;
 use function base64_encode;

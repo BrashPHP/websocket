@@ -1,14 +1,14 @@
 <?php
 
-namespace Kit\Websocket\Message\Protocols;
+namespace Brash\Websocket\Message\Protocols;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Connection\Events\OnConnectionErrorInterface;
-use Kit\Websocket\Connection\Events\OnConnectionOpenInterface;
-use Kit\Websocket\Connection\Events\OnDisconnecedConnectiontInterface;
-use Kit\Websocket\Exceptions\WebSocketException;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Message\Message;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Connection\Events\OnConnectionErrorInterface;
+use Brash\Websocket\Connection\Events\OnConnectionOpenInterface;
+use Brash\Websocket\Connection\Events\OnDisconnecedConnectiontInterface;
+use Brash\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Message\Message;
 
 abstract class AbstractBinaryMessageHandler implements ConnectionHandlerInterface
 {

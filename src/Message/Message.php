@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message;
+namespace Brash\Websocket\Message;
 
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Message\Exceptions\LimitationException;
-use Kit\Websocket\Message\Exceptions\MissingDataException;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Message\Exceptions\LimitationException;
+use Brash\Websocket\Message\Exceptions\MissingDataException;
 
 
 final class Message
@@ -18,7 +18,7 @@ final class Message
     const int MAX_MESSAGES_BUFFERING = 100;
 
     /**
-     * @var \Kit\Websocket\Frame\Frame[]
+     * @var \Brash\Websocket\Frame\Frame[]
      */
     private array $frames;
     private bool $isComplete;

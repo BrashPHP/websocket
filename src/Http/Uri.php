@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Kit\Websocket\Http;
+namespace Brash\Websocket\Http;
 
 use InvalidArgumentException;
 use JsonSerializable;

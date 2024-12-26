@@ -1,6 +1,6 @@
 <?php
 
-use Kit\Websocket\Utilities\KeyDigest;
+use Brash\Websocket\Utilities\KeyDigest;
 
 test('should digest id key and return valid base_64 string ', function (): void {
   $sut = new KeyDigest();

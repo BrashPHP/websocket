@@ -1,8 +1,8 @@
 <?php
 
-namespace Kit\Websocket\Http;
-use Kit\Websocket\Http\Exceptions\BadUpgradeException;
-use Kit\Websocket\Http\Exceptions\NoHttpException;
+namespace Brash\Websocket\Http;
+use Brash\Websocket\Http\Exceptions\BadUpgradeException;
+use Brash\Websocket\Http\Exceptions\NoHttpException;
 use Psr\Http\Message\RequestInterface;
 
 class RequestFactory

@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Connection;
+namespace Brash\Websocket\Connection;
 
-use Kit\Websocket\Connection\Events\OnConnectionErrorInterface;
-use Kit\Websocket\Connection\Events\OnConnectionOpenInterface;
-use Kit\Websocket\Connection\Events\OnDisconnecedConnectiontInterface;
-use Kit\Websocket\Events\OnDataReceivedEvent;
-use Kit\Websocket\Events\OnDisconnectEvent;
-use Kit\Websocket\Events\OnNewConnectionOpenEvent;
-use Kit\Websocket\Events\OnUpgradeEvent;
-use Kit\Websocket\Events\OnWebSocketExceptionEvent;
-use Kit\Websocket\Events\Protocols\ListenerProvider;
-use Kit\Websocket\Exceptions\WebSocketException;
-use Kit\Websocket\Handlers\OnUpgradeHandler;
-use Kit\Websocket\Message\Handlers\CloseFrameHandler;
-use Kit\Websocket\Message\Handlers\PingFrameHandler;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
+use Brash\Websocket\Connection\Events\OnConnectionErrorInterface;
+use Brash\Websocket\Connection\Events\OnConnectionOpenInterface;
+use Brash\Websocket\Connection\Events\OnDisconnecedConnectiontInterface;
+use Brash\Websocket\Events\OnDataReceivedEvent;
+use Brash\Websocket\Events\OnDisconnectEvent;
+use Brash\Websocket\Events\OnNewConnectionOpenEvent;
+use Brash\Websocket\Events\OnUpgradeEvent;
+use Brash\Websocket\Events\OnWebSocketExceptionEvent;
+use Brash\Websocket\Events\Protocols\ListenerProvider;
+use Brash\Websocket\Exceptions\WebSocketException;
+use Brash\Websocket\Handlers\OnUpgradeHandler;
+use Brash\Websocket\Message\Handlers\CloseFrameHandler;
+use Brash\Websocket\Message\Handlers\PingFrameHandler;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\Protocols\MessageHandlerInterface;
 
 final readonly class EventSubscriber
 {

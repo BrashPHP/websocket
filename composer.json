@@ -1,5 +1,5 @@
 {
-  "name": "kit/websocket",
+  "name": "brash/websocket",
   "description": "A Websocket implementation using ReactPHP",
   "keywords": [
     "php",
@@ -8,15 +8,12 @@
   ],
   "type": "library",
   "require": {
-    "php": "^8.3.0",
+    "php": ">=8.3.0",
     "psr/event-dispatcher": "^1.0@dev",
     "psr/http-message": "^2.0@dev",
-    "react/async": "^4.2",
     "react/event-loop": "^1.5",
     "react/promise": "^3.2.0",
-    "react/socket": "^1.0",
-    "react/stream": "^1.0",
-    "revolt/event-loop-adapter-react": "^1.1"
+    "react/socket": "^1.0"
   },
   "require-dev": {
     "laravel/pint": "^1.17.3",
@@ -31,7 +28,7 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Kit\\Websocket\\": "src/"
+      "Brash\\Websocket\\": "src/"
     },
     "files": [
       "src/functions/functions.php",

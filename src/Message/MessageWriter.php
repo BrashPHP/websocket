@@ -1,11 +1,11 @@
 <?php
 
-namespace Kit\Websocket\Message;
+namespace Brash\Websocket\Message;
 
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Frame\FrameFactory;
 use React\Socket\ConnectionInterface;
 
 class MessageWriter

@@ -1,21 +1,21 @@
 <?php
 
-namespace Kit\Websocket\Connection;
+namespace Brash\Websocket\Connection;
 
-use Kit\Websocket\Config\Config;
-use Kit\Websocket\Events\Protocols\PromiseListenerInterface;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Handlers\OnDataReceivedHandler;
-use Kit\Websocket\Message\MessageFactory;
-use Kit\Websocket\Message\MessageProcessor;
-use Kit\Websocket\Message\Protocols\MessageHandlerInterface;
+use Brash\Websocket\Config\Config;
+use Brash\Websocket\Events\Protocols\PromiseListenerInterface;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Handlers\OnDataReceivedHandler;
+use Brash\Websocket\Message\MessageFactory;
+use Brash\Websocket\Message\MessageProcessor;
+use Brash\Websocket\Message\Protocols\MessageHandlerInterface;
 use React\EventLoop\LoopInterface;
 
 final class DataHandlerFactory
 {
     private readonly TimeoutHandler $cachedtimeoutHandler;
     /**
-     * @var \Kit\Websocket\Message\Protocols\MessageHandlerInterface[]
+     * @var \Brash\Websocket\Message\Protocols\MessageHandlerInterface[]
      */
     private array $messageHandlers = [];
 

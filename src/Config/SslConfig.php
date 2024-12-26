@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Config;
+namespace Brash\Websocket\Config;
 
 final readonly class SslConfig
 {

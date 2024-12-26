@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Frame\Exceptions;
+namespace Brash\Websocket\Frame\Exceptions;
 
-use Kit\Websocket\Message\Exceptions\LimitationException;
+use Brash\Websocket\Message\Exceptions\LimitationException;
 
 class TooBigFrameException extends LimitationException
 {

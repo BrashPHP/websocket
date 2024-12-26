@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Message;
+namespace Brash\Websocket\Message;
 
 use Generator;
-use Kit\Websocket\Frame\Enums\CloseFrameEnum;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Message\Message;
-use Kit\Websocket\Message\Orchestration\MessageOrchestrator;
+use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Message\Message;
+use Brash\Websocket\Message\Orchestration\MessageOrchestrator;
 
 class MessageProcessor
 {

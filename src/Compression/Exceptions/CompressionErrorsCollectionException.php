@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kit\Websocket\Compression\Exceptions;
+namespace Brash\Websocket\Compression\Exceptions;
 
 class CompressionErrorsCollectionException extends \RuntimeException
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Kit\Websocket\Compression;
+namespace Brash\Websocket\Compression;
 
-use Kit\Websocket\Frame\Enums\FrameTypeEnum;
-use Kit\Websocket\Frame\Frame;
-use Kit\Websocket\Frame\FrameFactory;
-use Kit\Websocket\Frame\FrameMetadata;
-use Kit\Websocket\Frame\FramePayload;
-use function Kit\Websocket\functions\frameSize;
+use Brash\Websocket\Frame\Enums\FrameTypeEnum;
+use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Frame\FrameFactory;
+use Brash\Websocket\Frame\FrameMetadata;
+use Brash\Websocket\Frame\FramePayload;
+use function Brash\Websocket\functions\frameSize;
 
 readonly final class ServerCompressionContext
 {

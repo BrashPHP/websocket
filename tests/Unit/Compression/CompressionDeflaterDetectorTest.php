@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Compression;
 
-use Kit\Websocket\Compression\CompressionDeflaterDetector;
-use Kit\Websocket\Compression\Exceptions\CompressionErrorsCollectionException;
-use Kit\Websocket\Compression\Exceptions\InvalidTakeoverException;
-use Kit\Websocket\Compression\Exceptions\InvalidWindowSizeException;
+use Brash\Websocket\Compression\CompressionDeflaterDetector;
+use Brash\Websocket\Compression\Exceptions\CompressionErrorsCollectionException;
+use Brash\Websocket\Compression\Exceptions\InvalidTakeoverException;
+use Brash\Websocket\Compression\Exceptions\InvalidWindowSizeException;
 use Mockery\MockInterface;
 use Psr\Http\Message\RequestInterface;
-use Kit\Websocket\Compression\ServerCompressionContext;
-use Kit\Websocket\Compression\CompressionConf;
+use Brash\Websocket\Compression\ServerCompressionContext;
+use Brash\Websocket\Compression\CompressionConf;
 
 function createRequestMock(): RequestInterface|MockInterface
 {

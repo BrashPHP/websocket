@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Connection;
 
-use Kit\Websocket\Connection\Connection;
-use Kit\Websocket\Connection\TimeoutHandler;
-use Kit\Websocket\Events\Protocols\EventDispatcher;
+use Brash\Websocket\Connection\Connection;
+use Brash\Websocket\Connection\TimeoutHandler;
+use Brash\Websocket\Events\Protocols\EventDispatcher;
 use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
 use React\EventLoop\TimerInterface;

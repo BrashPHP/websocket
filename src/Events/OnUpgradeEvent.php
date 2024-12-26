@@ -1,8 +1,8 @@
 <?php
 
-namespace Kit\Websocket\Events;
+namespace Brash\Websocket\Events;
 
-use Kit\Websocket\Events\Protocols\Event;
+use Brash\Websocket\Events\Protocols\Event;
 use Psr\Http\Message\RequestInterface;
 
 class OnUpgradeEvent extends Event

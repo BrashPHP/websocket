@@ -1,10 +1,10 @@
 <?php
 
 namespace Tests\Unit\Handlers;
-use Kit\Websocket\Events\OnUpgradeEvent;
-use Kit\Websocket\Events\Protocols\EventDispatcher;
-use Kit\Websocket\Events\Protocols\ListenerProvider;
-use Kit\Websocket\Handlers\OnUpgradeHandler;
+use Brash\Websocket\Events\OnUpgradeEvent;
+use Brash\Websocket\Events\Protocols\EventDispatcher;
+use Brash\Websocket\Events\Protocols\ListenerProvider;
+use Brash\Websocket\Handlers\OnUpgradeHandler;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Socket\ConnectionInterface;
 

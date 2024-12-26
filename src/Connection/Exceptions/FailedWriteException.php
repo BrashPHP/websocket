@@ -1,8 +1,8 @@
 <?php
 
 
-namespace Kit\Websocket\Connection\Exceptions;
-use Kit\Websocket\Exceptions\WebSocketException;
+namespace Brash\Websocket\Connection\Exceptions;
+use Brash\Websocket\Exceptions\WebSocketException;
 
 final class FailedWriteException extends \RuntimeException
 {

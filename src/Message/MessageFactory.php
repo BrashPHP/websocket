@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Kit\Websocket\Message;
+namespace Brash\Websocket\Message;
 
 
 final readonly class MessageFactory

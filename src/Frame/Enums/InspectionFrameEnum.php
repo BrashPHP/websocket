@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Frame\Enums;
+namespace Brash\Websocket\Frame\Enums;
 
 /**
  * Mode from to is the default mode of inspection of frames.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Events\Protocols;
+namespace Brash\Websocket\Events\Protocols;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;

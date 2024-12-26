@@ -1,10 +1,10 @@
 <?php
 
-namespace Kit\Websocket\Compression;
+namespace Brash\Websocket\Compression;
 
-use Kit\Websocket\Compression\Exceptions\CompressionErrorsCollectionException;
-use Kit\Websocket\Compression\Exceptions\InvalidTakeoverException;
-use Kit\Websocket\Compression\Exceptions\InvalidWindowSizeException;
+use Brash\Websocket\Compression\Exceptions\CompressionErrorsCollectionException;
+use Brash\Websocket\Compression\Exceptions\InvalidTakeoverException;
+use Brash\Websocket\Compression\Exceptions\InvalidWindowSizeException;
 use Psr\Http\Message\RequestInterface;
 
 final class CompressionDeflaterDetector

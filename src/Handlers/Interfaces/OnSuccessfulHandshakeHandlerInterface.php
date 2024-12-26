@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Handlers\Interfaces;
+namespace Brash\Websocket\Handlers\Interfaces;
 
 interface OnSuccessfulHandshakeHandlerInterface
 {

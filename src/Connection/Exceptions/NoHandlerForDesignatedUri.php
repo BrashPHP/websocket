@@ -1,6 +1,6 @@
 <?php
 
-namespace Kit\Websocket\Connection\Exceptions;
+namespace Brash\Websocket\Connection\Exceptions;
 
 final class NoHandlerForDesignatedUri extends \Exception
 {
