@@ -139,7 +139,7 @@ $connectionHandlerInterface = new class extends AbstractTextMessageHandler {
         foreach ($broadcast as $conn) {
             $conn->writeText($data);
         }
-        $connection->writeText(strtoupper($data));
+        $connection->writeText($connection->getIp() . "says: ". strtoupper($data));
     }
 };
 
