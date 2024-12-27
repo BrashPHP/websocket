@@ -30,7 +30,7 @@ class WsServer
     private readonly EventSubscriber $subscriber;
     private LoggerInterface $logger;
     private LoopInterface $loop;
-    private ConnectionFactory $connectionFactory;
+    private readonly ConnectionFactory $connectionFactory;
 
     public function __construct(
         private readonly int $port,

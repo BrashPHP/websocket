@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Copyright (C) 2014-2024 Textalk and contributors.
- * This file is part of Websocket PHP and is free software under the ISC License.
- */
 
 namespace Brash\Websocket\Http;
 
@@ -36,7 +32,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
      * @return static
      */
     #[\Override]
-    public function withProtocolVersion(string $version): self
+    public function withProtocolVersion(string $version)
     {
         $new = clone $this;
         $new->version = $version;
