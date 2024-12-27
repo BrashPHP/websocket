@@ -26,13 +26,13 @@ test('should receive event correctly', function (): void {
         "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: "
         . "Upgrade\r\nSec-WebSocket-Accept: ueUhCZHX7AOVp2w1LVjpv4Tn05s=\r\n\r\n"
     );
-    $connectionInterfaceMock->shouldReceive('getRemoteAddress')->andReturn('0.0.0.1');
     $connectionFactory = new ConnectionFactory();
     $conn = $connectionFactory->createConnection(
         $connectionInterfaceMock,
         new NullLogger(),
         new EventDispatcher(new ListenerProvider()),
-        new Config(prod: false)
+        new Config(prod: false),
+        '0.0.0.1'
     );
 
     expect($handler->execute(new OnUpgradeEvent($request, $conn)))->not()->toThrow(\Exception::class);

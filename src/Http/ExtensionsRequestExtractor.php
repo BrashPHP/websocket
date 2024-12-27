@@ -1,6 +1,6 @@
 <?php
 
-namespace Brash\Websocket\Http;
+namespace Kit\Websocket\Http;
 use Psr\Http\Message\RequestInterface;
 
 

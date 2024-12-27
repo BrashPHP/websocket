@@ -158,7 +158,8 @@ class Connection
                 $request,
                 $this
             ));
-        } catch (\Throwable $exception) {
+        } catch (\Exception $exception) {
+            dump($exception);
             $errorMessage = json_encode(['error' => $exception->getMessage()]);
             $response = "HTTP/1.1 400 Bad Request\r\nContent-Length: " .
                 strlen($errorMessage) . "\r\nConnection: close\r\n\r\n" .

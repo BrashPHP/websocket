@@ -7,12 +7,13 @@ use Brash\Websocket\Frame\Enums\FrameTypeEnum;
 use Brash\Websocket\Frame\Frame;
 use Brash\Websocket\Frame\FrameFactory;
 use React\Socket\ConnectionInterface;
+use React\Stream\DuplexStreamInterface;
 
 class MessageWriter
 {
     public function __construct(
         private readonly FrameFactory $frameFactory,
-        private readonly ConnectionInterface $socket,
+        private readonly DuplexStreamInterface $socket,
         private readonly bool $writeMasked = false,
     ) {
     }

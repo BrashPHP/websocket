@@ -10,14 +10,16 @@ use Brash\Websocket\Message\MessageWriter;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use React\Socket\ConnectionInterface;
+use React\Stream\DuplexStreamInterface;
 
 final class ConnectionFactory
 {
     public function createConnection(
-        ConnectionInterface $connectionInterface,
+        DuplexStreamInterface $connectionInterface,
         LoggerInterface $logger,
         EventDispatcherInterface $eventDispatcher,
         Config $config,
+        string $ip,
     ): Connection {
         return new Connection(
             eventDispatcher: $eventDispatcher,
@@ -26,7 +28,7 @@ final class ConnectionFactory
                 socket: $connectionInterface,
                 writeMasked: $config->writeMasked
             ),
-            ip: $connectionInterface->getRemoteAddress(),
+            ip: $ip,
             logger: $logger,
         );
     }

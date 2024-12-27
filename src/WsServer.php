@@ -101,7 +101,8 @@ class WsServer
             $socketStream,
             $this->logger,
             $this->eventDispatcher,
-            $this->config
+            $this->config,
+            $socketStream->getRemoteAddress()
         );
 
         $socketStream->on('data', $connection->onMessage(...));
