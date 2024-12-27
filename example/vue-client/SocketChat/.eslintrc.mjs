@@ -1,4 +1,5 @@
 import pluginVue from 'eslint-plugin-vue'
+
 export default [
   // add more generic rulesets here, such as:
   // js.configs.recommended,
