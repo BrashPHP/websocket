@@ -35,6 +35,7 @@ $server->setConnectionHandler(
         foreach ($broadcast as $conn) {
             $conn->writeText($data);
         }
+        $connection->writeText(strtoupper($data));
     }
     }
 );

@@ -7,7 +7,10 @@ use Brash\Websocket\Events\OnDataReceivedEvent;
 use Brash\Websocket\Events\OnDisconnectEvent;
 use Brash\Websocket\Events\OnNewConnectionOpenEvent;
 use Brash\Websocket\Events\OnUpgradeEvent;
+use Brash\Websocket\Events\Protocols\EventDispatcher;
+use Brash\Websocket\Events\Protocols\ListenerProvider;
 use Brash\Websocket\Frame\Enums\CloseFrameEnum;
+use Brash\Websocket\Handlers\OnUpgradeHandler;
 use Brash\Websocket\Message\MessageWriter;
 use Mockery\LegacyMockInterface;
 use Mockery\MockInterface;
@@ -19,7 +22,12 @@ use function Tests\Helpers\getHandshake;
 
 function getMockEventDispatcher(): LegacyMockInterface|MockInterface|EventDispatcherInterface
 {
-    return mock(EventDispatcherInterface::class);
+    $listenerProvider = new ListenerProvider();
+    $listenerProvider->addListener(OnUpgradeEvent::class, new OnUpgradeHandler());
+
+    return new EventDispatcher(
+        $listenerProvider
+    );
 }
 
 function createSut(EventDispatcherInterface|MockInterface $eventDispatcher = null): Connection
@@ -34,10 +42,7 @@ function createSut(EventDispatcherInterface|MockInterface $eventDispatcher = nul
 }
 
 test('Should receive handshake correctly and dispatch upgrade event', function (): void {
-    $dispatcher = mock(EventDispatcherInterface::class);
-    $dispatcher->shouldReceive('dispatch')->with(OnUpgradeEvent::class)->andReturn(resolve('any_handshake_response'));
-    $dispatcher->shouldReceive('dispatch')->with(OnNewConnectionOpenEvent::class)->andReturn(resolve(null));
-    $sut = createSut($dispatcher);
+    $sut = createSut();
     $sut->getEventDispatcher();
     $sut->onMessage(getHandshake());
     expect($sut->isHandshakeDone())->toBeTrue();
@@ -45,13 +50,12 @@ test('Should receive handshake correctly and dispatch upgrade event', function (
 
 test('Should call OnDataReceivedEvent successfully after handshake', function (): void {
     $dispatcher = mock(EventDispatcherInterface::class);
-    $dispatcher->shouldReceive('dispatch')->with(OnUpgradeEvent::class)->andReturn(resolve('any_handshake_response'));
-    $dispatcher->shouldReceive('dispatch')->with(OnNewConnectionOpenEvent::class)->andReturn(resolve(null));
     $dispatcher->expects('dispatch')->with(OnDataReceivedEvent::class)->andReturn(resolve(null));
+    
 
     $connection = createSut($dispatcher);
-    $connection->onMessage(getHandshake());
-    $connection->onMessage('');
+    $connection->completeHandshake();
+    $connection->onMessage('blablabla');
 
     expect($connection->isHandshakeDone())->toBeTrue();
 
@@ -59,12 +63,11 @@ test('Should call OnDataReceivedEvent successfully after handshake', function ()
 
 test('Should call on disconnect correctly after successful handshake', function (): void {
     $dispatcher = mock(EventDispatcherInterface::class);
-    $dispatcher->shouldReceive('dispatch')->with(OnUpgradeEvent::class)->andReturn(resolve('any_handshake_response'));
-    $dispatcher->shouldReceive('dispatch')->with(OnNewConnectionOpenEvent::class)->andReturn(resolve(null));
+    
     $dispatcher->shouldReceive('dispatch')->with(OnDisconnectEvent::class)->andReturn(resolve(null));
-
+    
     $connection = createSut($dispatcher);
-    $connection->onMessage(getHandshake());
+    $connection->completeHandshake();
     $connection->onEnd();
 
     expect($connection->isHandshakeDone())->toBeTrue();

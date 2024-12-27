@@ -13,7 +13,8 @@ final class CompressionDeflaterDetector
 
     public function detect(RequestInterface $requestInterface): ?ServerCompressionContext
     {
-        $headerIn = strtolower(trim($requestInterface->getHeaderLine('Sec-WebSocket-Extensions')));
+        $secWebsocketExtensions = $requestInterface->getHeaderLine('Sec-WebSocket-Extensions') ?? "";
+        $headerIn = strtolower(trim($secWebsocketExtensions));
         if ($headerIn === '' || !str_starts_with($headerIn, 'permessage-deflate')) {
             return null;
         }

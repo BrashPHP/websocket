@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Brash\Websocket;
 
 use Brash\Websocket\Config\Config;
+use Brash\Websocket\Connection\ConnectionFactory;
 use Brash\Websocket\Connection\DataHandlerFactory;
 use Brash\Websocket\Connection\EventSubscriber;
 use Brash\Websocket\Events\Protocols\ListenerProvider;
 use Brash\Websocket\Events\Protocols\PromiseEventDispatcher;
-use Brash\Websocket\Frame\FrameFactory;
-use Brash\Websocket\Message\MessageWriter;
 use Brash\Websocket\Message\Protocols\ConnectionHandlerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -31,6 +30,7 @@ class WsServer
     private readonly EventSubscriber $subscriber;
     private LoggerInterface $logger;
     private LoopInterface $loop;
+    private ConnectionFactory $connectionFactory;
 
     public function __construct(
         private readonly int $port,
@@ -60,6 +60,7 @@ class WsServer
                 $this->loop
             )
         );
+        $this->connectionFactory = new ConnectionFactory();
     }
 
     public function setConnectionHandler(ConnectionHandlerInterface $connectionHandlerInterface): static
@@ -74,20 +75,19 @@ class WsServer
 
     public function start()
     {
-        $this->logger->info("Just started");
+        $this->logger->info("Websocket started");
 
         if ($this->config->sslConfig) {
             $serverFactory = new SslServerFactory();
-            $this->server = $serverFactory->createServer($this->server, $this->loop, $this->config->sslConfig);
-            $this->logger->info('Enabled ssl');
+            $this->server = $serverFactory->createServer(
+                $this->server,
+                $this->loop,
+                $this->config->sslConfig
+            );
+            $this->logger->info('SSL Enabled');
         }
 
-        $this->server->on(
-            'connection',
-            function (ConnectionInterface $connectionInterface): void {
-                $this->newConnection($connectionInterface);
-            }
-        );
+        $this->server->on('connection', $this->newConnection(...));
 
         $this->logger->info(message: sprintf("Listening on {$this->host}:{$this->port}"));
 
@@ -96,16 +96,12 @@ class WsServer
     private function newConnection(ConnectionInterface $socketStream)
     {
         $this->logger->debug("Socket Stream: {$socketStream->getRemoteAddress()}");
-        
-        $connection = new Connection(
-            eventDispatcher: $this->eventDispatcher,
-            messageWriter: new MessageWriter(
-                frameFactory: new FrameFactory(maxPayloadSize: $this->config->maxPayloadSize),
-                socket: $socketStream,
-                writeMasked: $this->config->writeMasked
-            ),
-            ip: $socketStream->getRemoteAddress(),
-            logger: $this->logger,
+
+        $connection = $this->connectionFactory->createConnection(
+            $socketStream,
+            $this->logger,
+            $this->eventDispatcher,
+            $this->config
         );
 
         $socketStream->on('data', $connection->onMessage(...));

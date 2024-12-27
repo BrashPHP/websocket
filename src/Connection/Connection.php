@@ -8,11 +8,13 @@ use Brash\Websocket\Compression\ServerCompressionContext;
 use Brash\Websocket\Connection\Exceptions\FailedWriteException;
 use Brash\Websocket\Events\OnDataReceivedEvent;
 use Brash\Websocket\Events\OnDisconnectEvent;
+use Brash\Websocket\Events\OnUpgradeEvent;
 use Brash\Websocket\Events\OnWebSocketExceptionEvent;
 use Brash\Websocket\Exceptions\WebSocketException;
 use Brash\Websocket\Frame\Enums\CloseFrameEnum;
 use Brash\Websocket\Frame\Enums\FrameTypeEnum;
 use Brash\Websocket\Frame\Frame;
+use Brash\Websocket\Http\RequestFactory;
 use Brash\Websocket\Message\MessageWriter;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -102,11 +104,13 @@ class Connection
         return $this->compression;
     }
 
-    public function setCompression(?ServerCompressionContext $serverCompressionContext): void{
+    public function setCompression(?ServerCompressionContext $serverCompressionContext): void
+    {
         $this->compression = $serverCompressionContext;
     }
 
-    public function completeHandshake(){
+    public function completeHandshake()
+    {
         $this->handshakeDone = true;
     }
 
@@ -146,10 +150,23 @@ class Connection
         $this->eventDispatcher->dispatch(new OnDataReceivedEvent($data, $this));
     }
 
-    protected function handshake(string $data): void{
-        $handshaker = new ConnectionHandshake($this);
+    protected function handshake(string $data): void
+    {
+        try {
+            $request = RequestFactory::createRequest($data);
+            $this->eventDispatcher->dispatch(new OnUpgradeEvent(
+                $request,
+                $this
+            ));
+        } catch (\Throwable $exception) {
+            $errorMessage = json_encode(['error' => $exception->getMessage()]);
+            $response = "HTTP/1.1 400 Bad Request\r\nContent-Length: " .
+                strlen($errorMessage) . "\r\nConnection: close\r\n\r\n" .
+                $errorMessage;
 
-        $handshaker->handshake($data);
+            $this->getSocketWriter()->write($response);
+            $this->getLogger()->error($errorMessage);
+        }
     }
 }
 

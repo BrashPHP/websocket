@@ -1,4 +1,4 @@
-# Kit/Websocket
+# Brash/Websocket
 
 ![example workflow](https://github.com/gabrielberthier/kit-websocket/actions/workflows/tests.yml/badge.svg)
 
@@ -9,6 +9,7 @@ Build your application using small, reusable and atomic components if you want o
 ---
 
 - [IMPORTANT](#important)
+- [Install](#install)
 - [How to](#how-to)
 - [Requirements](#requirements)
 - [Configuration](#configuration)
@@ -18,11 +19,11 @@ Build your application using small, reusable and atomic components if you want o
 - [Understanding The Protocol](#understanding-the-protocol)
 - [Based on](#based-on)
 
-<a name="kitwebsocket"></a>
+<a name="brashwebsocket"></a>
 
 ## IMPORTANT
 
-This library is server-side only. I did not have interest in implementing client code, but feel free to do it if you are into that.
+This library is server-side only. I did not have interest in implementing client code, but feel free to do it if you are into that ;)
 
 ## Install
 
@@ -189,3 +190,7 @@ This project relies on heavy documentation, tests and other repositories. You ca
 - [Websocket Client and Server for PHP](https://github.com/sirn-se/websocket-php/tree/v3.1-main)
 - [AMP Websocket Server](https://github.com/amphp/websocket-server/)
 - [Ratchet](https://github.com/ratchetphp/Ratchet)
+
+## Versioning
+
+This package follows the semver semantic versioning specification.

@@ -1,32 +1,21 @@
 <?php
 
+use Brash\Websocket\Message\MessageWriter;
+use Brash\Websocket\WsServer;
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\Loop;
 use React\Http\Message\Response;
 use React\Stream\CompositeStream;
 use React\Stream\ThroughStream;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-// simply use a shared duplex ThroughStream for all clients
-// it will simply emit any data that is sent to it
-// this means that any Upgraded data will simply be sent back to the client
 $chat = new ThroughStream();
 
-// Note how this example uses the `HttpServer` without the `StreamingRequestMiddleware`.
-// The initial incoming request does not contain a body and we upgrade to a
-// stream object below.
-$http = new React\Http\HttpServer(function (ServerRequestInterface $request) use ($chat): Response {
-    if ($request->getHeaderLine('Upgrade') !== 'chat' || $request->getProtocolVersion() === '1.0') {
-        return new Response(
-            Response::STATUS_UPGRADE_REQUIRED,
-            array(
-                'Upgrade' => 'chat'
-            ),
-            '"Upgrade: chat" required'
-        );
-    }
+$websocketServer = new WsServer(port: 1337);
 
+$http = new React\Http\HttpServer(function (ServerRequestInterface $request) use ($chat, $websocketServer): Response {
     // user stream forwards chat data and accepts incoming data
     $out = $chat->pipe(new ThroughStream());
     $in = new ThroughStream();
@@ -45,6 +34,10 @@ $http = new React\Http\HttpServer(function (ServerRequestInterface $request) use
         $chat->write($username . ': ' . $data . PHP_EOL);
     });
 
+    new MessageWriter(
+        
+    );
+
     // say hello to new user
     Loop::addTimer(0, function () use ($chat, $username, $out): void {
         $out->write('Welcome to this chat example, ' . $username . '!' . PHP_EOL);
@@ -57,7 +50,7 @@ $http = new React\Http\HttpServer(function (ServerRequestInterface $request) use
     });
 
     return new Response(
-        Response::STATUS_SWITCHING_PROTOCOLS,
+        StatusCodeInterface::STATUS_SWITCHING_PROTOCOLS,
         ['Upgrade' => 'chat'],
         $stream
     );

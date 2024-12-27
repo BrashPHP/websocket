@@ -15,10 +15,6 @@ use Psr\Http\Message\{
 };
 use Stringable;
 
-/**
- * Phrity\WebSocket\Http\Message class.
- * Only used for handshake procedure.
- */
 abstract class HttpMessage implements MessageInterface, Stringable
 {
     protected string $version = '1.1';
@@ -76,7 +72,7 @@ abstract class HttpMessage implements MessageInterface, Stringable
     #[\Override]
     public function getHeader(string $name): array
     {
-        $headers = $this->headers[strtolower($name)] ?: [];
+        $headers = $this->headers[strtolower($name)] ?? [];
         return $this->hasHeader($name)
             ? array_merge(...array_values($headers))
             : [];
