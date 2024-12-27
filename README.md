@@ -1,6 +1,6 @@
 # Brash/Websocket
 
-![example workflow](https://github.com/gabrielberthier/kit-websocket/actions/workflows/tests.yml/badge.svg)
+![example workflow](https://github.com/BrashPHP/websocket/actions/workflows/tests.yml/badge.svg)
 
 PHP has a number of REALLY good libraries to handle the WebSocket Protocol out there - some of which I solely based this project upon. This package/library/project offers a number of features present in those, using ReactPHP as its asyncronous handler.
 I developed this project as a way to understand in depth how the protocol worked in real life and how I could create something more lower-level with it without the need to use something more lower-level or too much abstracted, such as Socket.io and others.
